@@ -1,3 +1,5 @@
+import math
+
 import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
@@ -13,19 +15,32 @@ from PIL import Image
 #height=367
 
 
-def process_rgb(r,g,b):
-    return int(0.3*r+0.59*g+0.11*b)
+def process_rgb(r1, g1, b1, r2, g2, b2):
+    y1 = 0.299 * r1 + 0.587 * g1 + 0.114 * b1
+    i1 = 0.569 * r1 + 0.274 * g1 + 0.321 * b1
+    q1 = 0.211 * r1 + 0.526 * g1 + 0.311 * b1
+
+    y2 = 0.299 * r2 + 0.587 * g2 + 0.114 * b2
+    i2 = 0.569 * r2 + 0.274 * g2 + 0.321 * b2
+    q2 = 0.211 * r2 + 0.526 * g2 + 0.311 * b2
+    return y1-y2, i1-i2, q1-q2
 
 # Функция для нахождения ближайшего значения из массива results
-def find_nearest_value(value, results):
-    differences = np.abs(results - value)# Вычисляем абсолютную разницу между value и всеми элементами results
-    nearest_index = np.argmin(differences)# Находим индекс минимальной разницы
-    return results[nearest_index]# Возвращаем ближайшее значение
+def find_nearest_value(r1, g1, b1, results):
+
+    minimal_distance = 2000
+    index_of_color = 0
+    for idx, color in enumerate(results):
+        r2, g2, b2 = color
+        current = np.linalg.norm(process_rgb(r2, g2, b2, r1, g1, b1))
+        if minimal_distance > current:
+            minimal_distance = current
+            index_of_color = idx
+
+    return results[index_of_color]
 
 def number_to_rgb(value, colors, results):
     pass
-
-
 
 def get_index_by_value(arr, value):
     # Возвращает индекс первого вхождения value в массиве arr
@@ -39,33 +54,16 @@ def get_index_by_value(arr, value):
 #Вот эта функция типа итоговая она привязана к кнопке generate - т.е. вы можете менять тут че хотите но генерация
 #изображения должна оставаться здесь
 def func(width, height, path, input_colors):
+
     img_array = np.array(Image.open(path))  # Загрузка RGB-изображения и преобразование в массив
-    results = np.array([process_rgb(r, g, b) for r, g, b in input_colors])
-
-    arr = np.zeros([height, width, 1], dtype=int)  # вспомогательный массив
-
-    # переводим ргб
-    for y in range(height):
-        for x in range(width):
-            r, g, b = img_array[y, x]  # Получаем значения R, G, B
-            arr[y, x, 0] = process_rgb(r, g, b)  # Применяем функцию и сохраняем результат
-
-    # Проходим по массиву arr и заменяем значения на ближайшие из results
-    for y in range(height):
-        for x in range(width):
-            current_value = arr[y, x, 0]  # Получаем текущее значение из arr
-            nearest_value = find_nearest_value(current_value, results)  # Находим ближайшее значение из results
-            arr[y, x, 0] = nearest_value  # Заменяем значение в arr
-
-    # Создаем массив для нового изображения в формате RGB
+    # массив для нового изображения в формате RGB
     rgb_image = np.zeros((height, width, 3), dtype=np.uint8)
 
+    #создаем картину
     for y in range(height):
         for x in range(width):
-            value = arr[y, x, 0]
-            index = get_index_by_value(results, value)
-            r, g, b = input_colors[index]
-            rgb_image[y, x] = r, g, b
+            r, g, b = img_array[y, x] # Получаем значения R, G, B
+            rgb_image[y, x] = find_nearest_value(r, g, b, input_colors)
 
     # отобразить
     result_img = np.concatenate((img_array, rgb_image), axis=1)
