@@ -3,6 +3,7 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
+import csv
 
 #input_colors = [
         #(255, 0, 0),
@@ -51,6 +52,24 @@ def get_index_by_value(arr, value):
         return -1  # Если значение не найдено, возвращаем -1
 
 
+def save_tile_info(info_table, file_type='txt'):
+    file_name = f"info_table.{file_type}"
+    if file_type == "txt":
+        with open(file_name, 'w') as file:
+            for color, info in info_table.items():
+                r, g, b = color
+                count = info['count']
+                coordinates = "; ".join([f"({x}, {y})" for x, y in info['coordinates']])
+                file.write(f"Color: ({r}, {g}, {b})\nCount: {count}\nCoordinates: {coordinates}\n\n")
+
+    elif file_type == "csv":
+        with open(file_name, 'w') as file:
+            for color, info in info_table.items():
+                r, g, b = color
+                count = info['count']
+                coordinates = "; ".join([f"({x}, {y})" for x, y in info['coordinates']])
+                file.write(f"Color:\n ({r}, {g}, {b})\nCount:\n {count}\nCoordinates:\n {coordinates}\n\n")
+
 #Вот эта функция типа итоговая она привязана к кнопке generate - т.е. вы можете менять тут че хотите но генерация
 #изображения должна оставаться здесь
 def func(width, height, path, input_colors):
@@ -59,11 +78,20 @@ def func(width, height, path, input_colors):
     # массив для нового изображения в формате RGB
     rgb_image = np.zeros((height, width, 3), dtype=np.uint8)
 
+    info_table = {} #словарь для хранения инфы о плиточках(цвет, количество и координаты)
+
     #создаем картину
     for y in range(height):
         for x in range(width):
             r, g, b = img_array[y, x] # Получаем значения R, G, B
-            rgb_image[y, x] = find_nearest_value(r, g, b, input_colors)
+            #rgb_image[y, x] = find_nearest_value(r, g, b, input_colors)
+            nearest_color = tuple(find_nearest_value(r, g, b, input_colors))
+            rgb_image[y, x] = nearest_color
+
+            if nearest_color not in info_table:
+                info_table[nearest_color] = {"count": 0, "coordinates": []}
+            info_table[nearest_color]["count"] += 1
+            info_table[nearest_color]["coordinates"].append((x, y))
 
     # отобразить
     result_img = np.concatenate((img_array, rgb_image), axis=1)
@@ -71,8 +99,13 @@ def func(width, height, path, input_colors):
     plt.imshow(result_img)
     plt.show()
 
+    save_tile_info(info_table)
+    save_tile_info(info_table, 'csv')
+
     # img = Image.fromarray(array)
     # img.save('imrgb.png')
     print(img_array)
+
+
 
 
