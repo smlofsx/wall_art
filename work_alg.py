@@ -3,6 +3,7 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
+from matplotlib.backend_bases import MouseButton
 
 #input_colors = [
         #(255, 0, 0),
@@ -50,6 +51,17 @@ def get_index_by_value(arr, value):
     else:
         return -1  # Если значение не найдено, возвращаем -1
 
+def get_square_by_coordinate(x, y, height, width, size_of_square, img):
+    x_real_coord = x*size_of_square
+    y_real_coord = y*size_of_square
+    print(x_real_coord, y_real_coord)
+    rgb_image = np.zeros((size_of_square, size_of_square, 3), dtype=np.uint8)
+    for x_real in range(size_of_square):
+        for y_real in range (size_of_square):
+            rgb_image[y_real, x_real] = img[y_real+y_real_coord, x_real + x_real_coord]
+    plt.figure(figsize=(5, 5))
+    plt.imshow(rgb_image)
+    plt.show()
 
 #Вот эта функция типа итоговая она привязана к кнопке generate - т.е. вы можете менять тут че хотите но генерация
 #изображения должна оставаться здесь
@@ -66,13 +78,31 @@ def func(width, height, path, input_colors):
             rgb_image[y, x] = find_nearest_value(r, g, b, input_colors)
 
     # отобразить
+    size_of_square = 5
+
     result_img = np.concatenate((img_array, rgb_image), axis=1)
-    plt.figure(figsize=(5, 5))
+    plt.figure(figsize=(14, 7))
+
+    def on_click(event):
+        if event.button is MouseButton.LEFT:
+            if event.xdata>0 and event.ydata>0:
+                print(event.xdata)
+                print(event.ydata)
+                print(event.xdata//size_of_square)
+                print(event.ydata//size_of_square)
+                get_square_by_coordinate(
+                    int (event.xdata//size_of_square),
+                    int (event.ydata//size_of_square),
+                    height, width,
+                    size_of_square,
+                    result_img)
+
+    plt.connect('button_press_event', on_click)
     plt.imshow(result_img)
     plt.show()
 
     # img = Image.fromarray(array)
     # img.save('imrgb.png')
-    print(img_array)
+    # print(img_array)
 
 
