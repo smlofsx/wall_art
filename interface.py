@@ -1,15 +1,13 @@
 from work_alg import func
+from WallArtGenerate import Ui_MainWindow
 
 import sys
-from PyQt5 import uic
-from PyQt5.QtWidgets import QApplication, QFileDialog, QMessageBox
+from PyQt5.QtWidgets import QApplication, QFileDialog, QMessageBox, QMainWindow
 from PyQt5.QtGui import QImage, QPixmap
 from PIL import Image
 
-# Загрузка UI файла
-Form, Window = uic.loadUiType("WallArtGenerate.ui")
 
-class MyApp(Form, Window):
+class MyApp(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
