@@ -17,7 +17,6 @@ class MyApp(QMainWindow, Ui_MainWindow):
         self.loadPaletteButton.clicked.connect(self.load_palette)
         self.generateButton.clicked.connect(self.generate)
 
-
         self.width = None
         self.height = None
         self.path = None
@@ -32,18 +31,61 @@ class MyApp(QMainWindow, Ui_MainWindow):
             self.width, self.height = image.size
             self.path = file_name
             # Выводим информацию о загруженном изображении
-            #self.imageLabel.setText(f"Loaded Image: {file_name}\nWidth: {self.width}, Height: {self.height}")
+            # self.imageLabel.setText(f"Loaded Image: {file_name}\nWidth: {self.width}, Height: {self.height}")
+
+    def is_valid_color_line(self, line: str) -> bool:
+        # Требуемый формат строки палитры - 3 числа от 0 до 256
+        parts = line.split()
+        if len(parts) != 3:
+            return False
+        # Все числа целые
+        try:
+            r, g, b = map(int, parts)
+        except ValueError:
+            return False
+        # Верный диапазон
+        return all(0 <= num <= 256 for num in (r, g, b))
 
     def load_palette(self):
         # Открываем проводник для выбора файла с палитрой
         file_name, _ = QFileDialog.getOpenFileName(self, "Open Palette File", "", "Text Files (*.txt)")
-        if file_name:
-            # Читаем цвета из файла
+
+        if not file_name:
+            return
+
+        try:
             with open(file_name, 'r') as file:
                 lines = file.readlines()
-                self.input_colors = [tuple(map(int, line.strip().split())) for line in lines]
-            # Выводим информацию о загруженной палитре
-            #self.paletteLabel.setText(f"Loaded Palette: {file_name}\nColors: {self.input_colors}")
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"File read error: {str(e)}")
+            return
+
+        error_lines = []
+        for i, line in enumerate(lines, 1):
+            stripped_line = line.strip()
+            # пустые строки
+            if not stripped_line:
+                continue
+            # непустые
+            if not self.is_valid_color_line(stripped_line):
+                error_lines.append(i)
+
+        # есть ошибки - показываем и прерываем
+        if error_lines:
+            error_msg = "Invalid data in lines: " + ", ".join(map(str, error_lines))
+            QMessageBox.critical(self, "Format Error", error_msg)
+            return
+
+        # все ок - парсим
+        self.input_colors = []
+        for line in lines:
+            stripped_line = line.strip()
+            if stripped_line:
+                r, g, b = map(int, stripped_line.split())
+                self.input_colors.append((r, g, b))
+
+        # Выводим инфу о загруженной палитре
+        # self.paletteLabel.setText(f"Loaded Palette: {file_name}\nColors: {self.input_colors}")
 
     def generate(self):
         # Проверяем, загружены ли изображение и палитра
