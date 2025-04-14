@@ -1,4 +1,5 @@
 import math
+from typing import override
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -101,7 +102,7 @@ def get_square_by_coordinate(x, y, height, width, size_of_square, img):
     color_counts = {}
     for y_real in range(size_of_square):
         for x_real in range (size_of_square):
-            if x_real+x_real_coord>=width and x_real+x_real_coord<2*width and y_real+y_real_coord<height: # проверка на выход за границы изображения
+            if x_real+x_real_coord>=0 and x_real+x_real_coord<width and y_real+y_real_coord<height: # проверка на выход за границы изображения
                 rgb_image[y_real, x_real] = img[y_real+y_real_coord, x_real + x_real_coord]
                 color = tuple(img[y_real + y_real_coord, x_real + x_real_coord])  # RGB-кортеж
                 if color not in color_counts:
@@ -142,12 +143,31 @@ def get_square_by_coordinate(x, y, height, width, size_of_square, img):
     """
 
 def drow_grid(w, h, size):
-    w=(w//size+1)*size
-    for x in range(w, w*2, size):
+    for x in range(0, w, size):
         plt.axvline(x=x, ymin=0, ymax=1,
-                color='red')
+                color="#db2c2c")
     for y in range(0, h, size):
-        plt.axhline(y=y, xmin=0.5, xmax=1, color='red')
+        plt.axhline(y=y, xmin=0, xmax=1, color="#db2c2c")
+
+
+def show_main_pic(height, rgb_image, size_of_square, width):
+    def on_click_main(event):
+        if event.button is MouseButton.LEFT:
+            if event.xdata != None and event.ydata != None and event.xdata > 0 and event.ydata > 0:
+                print(event.xdata, event.ydata)
+                get_square_by_coordinate(
+                    int(event.xdata // size_of_square),
+                    int(event.ydata // size_of_square),
+                    height, width,
+                    size_of_square,
+                    rgb_image)
+
+    plt.figure(figsize=(11, 12), facecolor='lightgray')
+    plt.connect('button_press_event', on_click_main)
+    drow_grid(width, height, size_of_square)  # отображаем сетку блоков
+    plt.imshow(rgb_image, extent=[0, width, 0, height])
+    plt.show()
+
 
 #Вот эта функция типа итоговая она привязана к кнопке generate - т.е. вы можете менять тут че хотите но генерация
 #изображения должна оставаться здесь
@@ -181,6 +201,39 @@ def func(width, height, path, input_colors):
     size_of_square = 10
 
     result_img = np.concatenate((img_array, rgb_image), axis=1)
+
+    white_line = np.zeros((2, width*2, 3), dtype=np.uint8)
+    for i in white_line:
+        for j in i:
+            j[0] = 211
+            j[1] = 211
+            j[2] = 211 #я не знаю почему если написать = [255, 255, 255] оно не приравнивается нормально
+    # добавим белую линию после изображения
+    result_img = np.concatenate((result_img,white_line), axis = 0)
+    green_half = np.zeros((16, width, 3), dtype=np.uint8)
+    for i in green_half:
+        for j in i:
+            j[0] = 211
+            j[1] = 211
+            j[2] = 211
+    red_half = np.zeros((16, width, 3), dtype=np.uint8)
+    for i in red_half:
+        for idx, j in enumerate(i):
+            if idx > width/2 + 1:
+                j[0] = 199
+                j[1] = 22
+                j[2] = 40
+            elif idx < width / 2 - 1:
+                j[0] = 22
+                j[1] = 199
+                j[2] = 40
+            else:
+                j[0] = 211
+                j[1] = 211
+                j[2] = 211
+    yes_or_no = np.concatenate((green_half, red_half), axis = 1)
+
+    result_img = np.concatenate((result_img,yes_or_no), axis = 0)
     plt.figure(figsize=(14, 7), facecolor='lightgray')
 
     #plt.axis([0, width * 2, 0, height])
@@ -188,17 +241,20 @@ def func(width, height, path, input_colors):
     def on_click(event):
         if event.button is MouseButton.LEFT:
             if event.xdata!=None and event.ydata!=None and event.xdata>width and event.ydata>0:
-                print(event.xdata, event.ydata)
-                get_square_by_coordinate(
-                    int (event.xdata//size_of_square),
-                    int (event.ydata//size_of_square),
-                    height, width,
-                    size_of_square,
-                    result_img)
+                print(event.xdata, event.ydata, width)
+                if event.ydata <= 13 and event.xdata > width and event.xdata < width+ width/2 -1:
+                    plt.close("all")
+                    show_main_pic(height, rgb_image, size_of_square, width)
+
+                if event.ydata <= 13 and event.xdata > width + width/2 + 1 and event.xdata < width *2:
+                    plt.close("all")
 
 
     plt.connect('button_press_event', on_click)
-    plt.imshow(result_img, extent=[0, width*2, 0, height])
-    drow_grid(width, height, size_of_square) #отображаем сетку блоков
+    plt.imshow(result_img, extent=[0, width*2, 0, height+4])
+    #drow_grid(width, height, size_of_square) #отображаем сетку блоков
+    plt.axis('off')
     plt.show()
+
+
 
