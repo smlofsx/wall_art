@@ -16,13 +16,14 @@ class MyApp(QMainWindow, Ui_MainWindow):
         self.loadImageButton.clicked.connect(self.load_image)
         self.loadPaletteButton.clicked.connect(self.load_palette)
         self.block_size.clicked.connect(self.enter_size_click)
-
+        self.select_format.activated.connect(self.current_format)
         self.generateButton.clicked.connect(self.generate)
         self.size = None
         self.width = None
         self.height = None
         self.path = None
         self.input_colors = []
+        self.format_to_save = ".cvs" # может быть еще .txt
 
     def load_image(self):
         # Открываем проводник для выбора изображения
@@ -100,13 +101,18 @@ class MyApp(QMainWindow, Ui_MainWindow):
             QMessageBox.critical(self, "Format Error", error_msg)
             return
 
+    def current_format(self, _):
+        ctext = self.select_format.currentText()
+        self.format_to_save = ctext
+
     def generate(self):
         # Проверяем, загружены ли изображение и палитра
-        if not all([self.width, self.height, self.path, self.input_colors]):
-            QMessageBox.warning(self, "Error", "Please load both image and palette before generating.")
+        #print(self.format_to_save, self.size)
+        if not all([self.width, self.height, self.path, self.input_colors, self.size]):
+            QMessageBox.warning(self, "Error", "Please load all things before generating.")
             return
         # Вызываем функцию генерации
-        func(self.width, self.height, self.path, self.input_colors)
+        func(self.width, self.height, self.path, self.input_colors, self.format_to_save, self.size)
 
 
 if __name__ == "__main__":

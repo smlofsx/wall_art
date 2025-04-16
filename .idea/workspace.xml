@@ -4,12 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2bdc7d0c-71d8-484f-acad-26f1a7788f7a" name="Changes" comment="---">
-      <change afterPath="$PROJECT_DIR$/bad_palette.txt" afterDir="false" />
+    <list default="true" id="2bdc7d0c-71d8-484f-acad-26f1a7788f7a" name="Changes" comment="new все остальное">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WallArtGenerate.py" beforeDir="false" afterPath="$PROJECT_DIR$/WallArtGenerate.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WallArtGenerate.ui" beforeDir="false" afterPath="$PROJECT_DIR$/WallArtGenerate.ui" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/interface.py" beforeDir="false" afterPath="$PROJECT_DIR$/interface.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/work_alg.py" beforeDir="false" afterPath="$PROJECT_DIR$/work_alg.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,12 +35,12 @@
     &quot;assignee&quot;: &quot;Itsmemaybe&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/smlofsx/wall_art.git&quot;,
-    &quot;accountId&quot;: &quot;e0f7d164-64a4-406a-9961-407447e10d69&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/smlofsx/wall_art",
+    "accountId": "e0f7d164-64a4-406a-9961-407447e10d69"
   }
-}</component>
+}]]></component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 6
 }</component>
@@ -51,16 +49,16 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.interface.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "interface__ver2",
-    "last_opened_file_path": "C:/Users/User/PycharmProjects/wall_art_new",
-    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.interface.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;interface__ver2&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/User/PycharmProjects/wall_art_new&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\User\PycharmProjects\wall_art_new" />
@@ -119,7 +117,15 @@
       <option name="project" value="LOCAL" />
       <updated>1744699466079</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="new все остальное">
+      <option name="closed" value="true" />
+      <created>1744701797087</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1744701797087</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -127,6 +133,7 @@
     <MESSAGE value="для requirements.txt" />
     <MESSAGE value="---" />
     <MESSAGE value="new work_alg" />
-    <option name="LAST_COMMIT_MESSAGE" value="new work_alg" />
+    <MESSAGE value="new все остальное" />
+    <option name="LAST_COMMIT_MESSAGE" value="new все остальное" />
   </component>
 </project>

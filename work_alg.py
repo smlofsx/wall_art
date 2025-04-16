@@ -171,7 +171,8 @@ def show_main_pic(height, rgb_image, size_of_square, width):
 
 #Вот эта функция типа итоговая она привязана к кнопке generate - т.е. вы можете менять тут че хотите но генерация
 #изображения должна оставаться здесь
-def func(width, height, path, input_colors):
+#!!!добавила переменные отвечающие за размер блока и формат вывода - ".cvc"/".txt"
+def func(width, height, path, input_colors, format_to_save, block_size):
 
     img_array = np.array(Image.open(path))  # Загрузка RGB-изображения и преобразование в массив
     rgb_image = np.zeros((height, width, 3), dtype=np.uint8) # массив для нового изображения в формате RGB
@@ -197,8 +198,9 @@ def func(width, height, path, input_colors):
     ###print(img_array)
 
 
-    ### размер блока должен подаваться как входные данные ###
-    size_of_square = 10
+    ### размер блока должен подаваться как входные данные
+    ### добавила сюда размер блока из входных данных
+    size_of_square = block_size
 
     result_img = np.concatenate((img_array, rgb_image), axis=1)
 
