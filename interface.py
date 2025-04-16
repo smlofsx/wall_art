@@ -1,9 +1,11 @@
 from work_alg import func
 from WallArtGenerate import Ui_MainWindow
+from palette import ColorVisualizer
 
 import sys
 from PyQt5.QtWidgets import QApplication, QFileDialog, QMessageBox, QMainWindow
 from PyQt5.QtGui import QImage, QPixmap
+from PyQt5.QtCore import Qt
 from PIL import Image
 
 
@@ -11,6 +13,7 @@ class MyApp(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        self.visualizer_window = None  # Добавляем атрибут для хранения ссылки на окно визуализатора
 
         # Подключение кнопок к функциям
         self.loadImageButton.clicked.connect(self.load_image)
@@ -23,7 +26,7 @@ class MyApp(QMainWindow, Ui_MainWindow):
         self.height = None
         self.path = None
         self.input_colors = []
-        self.format_to_save = ".cvs" # может быть еще .txt
+        self.format_to_save = ".cvs"  # может быть еще .txt
 
     def load_image(self):
         # Открываем проводник для выбора изображения
@@ -33,8 +36,6 @@ class MyApp(QMainWindow, Ui_MainWindow):
             image = Image.open(file_name)
             self.width, self.height = image.size
             self.path = file_name
-            # Выводим информацию о загруженном изображении
-            # self.imageLabel.setText(f"Loaded Image: {file_name}\nWidth: {self.width}, Height: {self.height}")
 
     def is_valid_color_line(self, line: str) -> bool:
         # Требуемый формат строки палитры - 3 числа от 0 до 256
@@ -88,7 +89,12 @@ class MyApp(QMainWindow, Ui_MainWindow):
                 self.input_colors.append((r, g, b))
 
         # Выводим инфу о загруженной палитре
-        # self.paletteLabel.setText(f"Loaded Palette: {file_name}\nColors: {self.input_colors}")
+        if self.visualizer_window:
+            self.visualizer_window.close()  # Закрываем предыдущее окно, если оно было
+
+        self.visualizer_window = ColorVisualizer(self.input_colors)
+        self.visualizer_window.setAttribute(Qt.WA_DeleteOnClose, False)  # Не удалять объект при закрытии
+        self.visualizer_window.show()
 
     def enter_size_click(self):
         text = self.lineEdit.text()
@@ -107,7 +113,6 @@ class MyApp(QMainWindow, Ui_MainWindow):
 
     def generate(self):
         # Проверяем, загружены ли изображение и палитра
-        #print(self.format_to_save, self.size)
         if not all([self.width, self.height, self.path, self.input_colors, self.size]):
             QMessageBox.warning(self, "Error", "Please load all things before generating.")
             return
