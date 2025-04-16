@@ -4,10 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2bdc7d0c-71d8-484f-acad-26f1a7788f7a" name="Changes" comment="добавила обработку размера блока и формата вывода из входных данных (теперь они в ворк алге в основной функции в качестве параметров)">
-      <change afterPath="$PROJECT_DIR$/palette.py" afterDir="false" />
+    <list default="true" id="2bdc7d0c-71d8-484f-acad-26f1a7788f7a" name="Changes" comment="визуализация палитры">
+      <change afterPath="$PROJECT_DIR$/big_palette.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/interface.py" beforeDir="false" afterPath="$PROJECT_DIR$/interface.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -134,7 +133,15 @@
       <option name="project" value="LOCAL" />
       <updated>1744818995423</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="визуализация палитры">
+      <option name="closed" value="true" />
+      <created>1744821967848</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1744821967848</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -144,6 +151,7 @@
     <MESSAGE value="new work_alg" />
     <MESSAGE value="new все остальное" />
     <MESSAGE value="добавила обработку размера блока и формата вывода из входных данных (теперь они в ворк алге в основной функции в качестве параметров)" />
-    <option name="LAST_COMMIT_MESSAGE" value="добавила обработку размера блока и формата вывода из входных данных (теперь они в ворк алге в основной функции в качестве параметров)" />
+    <MESSAGE value="визуализация палитры" />
+    <option name="LAST_COMMIT_MESSAGE" value="визуализация палитры" />
   </component>
 </project>
