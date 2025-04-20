@@ -1,6 +1,6 @@
 import math
 from typing import override
-
+from palette import ColorVisualizer
 import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image

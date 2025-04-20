@@ -4,9 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2bdc7d0c-71d8-484f-acad-26f1a7788f7a" name="Changes" comment="визуализация палитры">
-      <change afterPath="$PROJECT_DIR$/big_palette.txt" afterDir="false" />
+    <list default="true" id="2bdc7d0c-71d8-484f-acad-26f1a7788f7a" name="Changes" comment="палитра побольше для тестов">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/palette.py" beforeDir="false" afterPath="$PROJECT_DIR$/palette.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/work_alg.py" beforeDir="false" afterPath="$PROJECT_DIR$/work_alg.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,7 +24,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="main" />
+        <entry key="$PROJECT_DIR$" value="interface_ver2" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -34,12 +35,12 @@
     &quot;assignee&quot;: &quot;Itsmemaybe&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/smlofsx/wall_art",
-    "accountId": "e0f7d164-64a4-406a-9961-407447e10d69"
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/smlofsx/wall_art&quot;,
+    &quot;accountId&quot;: &quot;e0f7d164-64a4-406a-9961-407447e10d69&quot;
   }
-}]]></component>
+}</component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 6
 }</component>
@@ -54,7 +55,7 @@
     "Python.palette.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "interface__ver2",
+    "git-widget-placeholder": "print__by__color",
     "last_opened_file_path": "C:/Users/User/PycharmProjects/wall_art_new",
     "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
   }
@@ -141,7 +142,15 @@
       <option name="project" value="LOCAL" />
       <updated>1744821967848</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="палитра побольше для тестов">
+      <option name="closed" value="true" />
+      <created>1744822697975</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1744822697975</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -152,6 +161,7 @@
     <MESSAGE value="new все остальное" />
     <MESSAGE value="добавила обработку размера блока и формата вывода из входных данных (теперь они в ворк алге в основной функции в качестве параметров)" />
     <MESSAGE value="визуализация палитры" />
-    <option name="LAST_COMMIT_MESSAGE" value="визуализация палитры" />
+    <MESSAGE value="палитра побольше для тестов" />
+    <option name="LAST_COMMIT_MESSAGE" value="палитра побольше для тестов" />
   </component>
 </project>
