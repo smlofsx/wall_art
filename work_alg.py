@@ -59,6 +59,18 @@ def get_index_by_value(arr, value):
     else:
         return -1  # Если значение не найдено, возвращаем -1
 
+def show_pic_by_color(color, img, width, height): # вывод всей картинки по цвету
+    res=np.zeros((height, width, 3), dtype=np.uint8)
+
+    for y in range(height):
+        for x in range(width):
+            if not np.array_equal(img[y, x], color):  # если не тот цвет, красим в черный
+                res[y][x] = (0, 0, 0)
+            else:
+                res[y][x] = img[y][x]
+    plt.figure(figsize=(8, 9), facecolor='lightgray')
+    plt.imshow(res, extent=[0, width, height, 0])
+    plt.show()
 
 def save_tile_info(info_table, file_type='txt'):
     file_name = f"info_table.{file_type}"
@@ -78,7 +90,7 @@ def save_tile_info(info_table, file_type='txt'):
                 coordinates = "; ".join([f"({x}, {y})" for x, y in info['coordinates']])
                 file.write(f"Color:\n ({r}, {g}, {b})\nCount:\n {count}\nCoordinates:\n {coordinates}\n\n")
 
-def show_color(size, x1, y1, block):
+def show_color(size, x1, y1, block): # вывод блока по цвету
 
         x1 = math.floor(x1)
         y1 = math.floor(y1)
@@ -186,6 +198,7 @@ def show_main_pic(height, rgb_image, size_of_square, width, input_colors):
                         timer.start(100)  # Обновляем каждые 100 мс
                     elif (event.xdata > int(width/2)+1):
                         print("save")
+                        show_pic_by_color(rgb_image[1,1], rgb_image, width, height)
 
     width1=0 # левая кнопка
     width2 = 0 # правая кнопка
