@@ -15,11 +15,8 @@ def show_pic_by_color(color, img, width, height): # вывод всей карт
         for x in range(width):
             if not np.array_equal(img[y, x], color):  # если не тот цвет, красим в черный
                 res[y][x] = (0, 0, 0)
-                print("yes")
             else:
                 res[y][x] = img[y][x]
-                print("no")
-    print("print")
     plt.figure(figsize=(8, 9), facecolor='lightgray')
     plt.imshow(res, extent=[0, width, height, 0])
     plt.show(block=False)

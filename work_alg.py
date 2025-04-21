@@ -279,8 +279,6 @@ def func(width, height, path, input_colors, format_to_save, block_size):
     config.global_w = width
     config.global_h = height
 
-    print(config.global_img, config.global_w, config.global_h)
-
     ### таблицы тоже должны создаваться по требованию а не каждый раз ###
     ###save_tile_info(info_table)
     ###save_tile_info(info_table, 'csv')
