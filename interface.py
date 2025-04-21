@@ -119,6 +119,7 @@ class MyApp(QMainWindow, Ui_MainWindow):
             QMessageBox.warning(self, "Error", "Please load all things before generating.")
             return
         # Вызываем функцию генерации
+
         func(self.width, self.height, self.path, self.input_colors, self.format_to_save, self.size)
 
 

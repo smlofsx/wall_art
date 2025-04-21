@@ -3,8 +3,26 @@ from PyQt5.QtWidgets import (QApplication, QWidget, QVBoxLayout, QHBoxLayout,
                              QPushButton, QLabel)
 from PyQt5.QtGui import QColor, QPainter, QFont, QPainterPath
 from PyQt5.QtCore import Qt, QRectF
+import numpy as np
+import matplotlib.pyplot as plt
+import config
 
 
+def show_pic_by_color(color, img, width, height): # вывод всей картинки по цвету
+    res=np.zeros((height, width, 3), dtype=np.uint8)
+
+    for y in range(height):
+        for x in range(width):
+            if not np.array_equal(img[y, x], color):  # если не тот цвет, красим в черный
+                res[y][x] = (0, 0, 0)
+                print("yes")
+            else:
+                res[y][x] = img[y][x]
+                print("no")
+    print("print")
+    plt.figure(figsize=(8, 9), facecolor='lightgray')
+    plt.imshow(res, extent=[0, width, height, 0])
+    plt.show(block=False)
 
 
 class ColorButton(QPushButton):
@@ -121,12 +139,12 @@ class ColorVisualizer(QWidget):
     def on_color_clicked(self, brightness_key):
         """Обработчик нажатия на цветную кнопку"""
         button = self.color_buttons[brightness_key]
-        r, g, b = button.color.red(), button.color.green(), button.color.blue()
+        color = r, g, b = button.color.red(), button.color.green(), button.color.blue()
         if self.flag == 0:
             print(f"Clicked color: RGB({r}, {g}, {b}), Brightness key: {brightness_key}")
         else:
-            #вот тут надо типа вызвать новое окошко с выводом по конкретному цвету
-            return
+            print(color, config.global_img, config.global_w, config.global_h)
+            show_pic_by_color(color, config.global_img, config.global_w, config.global_h)
 
 
 
@@ -181,3 +199,4 @@ def show_palette_nonblocking(colors):
     # Обрабатываем события Qt без блокировки
     app.processEvents()
     return visualizer
+

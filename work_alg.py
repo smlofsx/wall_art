@@ -9,6 +9,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QFileDialog, QMessageBox, QMainWindow
 import csv
 import sys
+import config
 
 #input_colors = [
         #(255, 0, 0),
@@ -24,8 +25,7 @@ import sys
 global_input_colors=[]
 size_of_button=14 # высота кнопок на итоговой картинке
 size_of_line = 2
-global_w=0
-global_h=0
+
 
 def process_rgb(r1, g1, b1, r2, g2, b2):
     y1 = 0.299 * r1 + 0.587 * g1 + 0.114 * b1
@@ -59,18 +59,7 @@ def get_index_by_value(arr, value):
     else:
         return -1  # Если значение не найдено, возвращаем -1
 
-def show_pic_by_color(color, img, width, height): # вывод всей картинки по цвету
-    res=np.zeros((height, width, 3), dtype=np.uint8)
 
-    for y in range(height):
-        for x in range(width):
-            if not np.array_equal(img[y, x], color):  # если не тот цвет, красим в черный
-                res[y][x] = (0, 0, 0)
-            else:
-                res[y][x] = img[y][x]
-    plt.figure(figsize=(8, 9), facecolor='lightgray')
-    plt.imshow(res, extent=[0, width, height, 0])
-    plt.show()
 
 def save_tile_info(info_table, file_type='txt'):
     file_name = f"info_table.{file_type}"
@@ -186,7 +175,11 @@ def show_main_pic(height, rgb_image, size_of_square, width, input_colors):
                         height, width,
                         size_of_square,
                         rgb_image)
+
                 else: # кнопки
+                    global_h = height
+                    global_w = width
+                    global_img = rgb_image
                     if (event.xdata < int(width/2)-1):
                         # Создаем QApplication если его нет
                         app = QApplication.instance() or QApplication([])
@@ -196,9 +189,10 @@ def show_main_pic(height, rgb_image, size_of_square, width, input_colors):
                         timer = QTimer()
                         timer.timeout.connect(lambda: app.processEvents())
                         timer.start(100)  # Обновляем каждые 100 мс
+
                     elif (event.xdata > int(width/2)+1):
                         print("save")
-                        show_pic_by_color(rgb_image[1,1], rgb_image, width, height)
+                        #show_pic_by_color(rgb_image[1,1], rgb_image, width, height)
 
     width1=0 # левая кнопка
     width2 = 0 # правая кнопка
@@ -265,13 +259,9 @@ def show_main_pic(height, rgb_image, size_of_square, width, input_colors):
 #!!!добавила переменные отвечающие за размер блока и формат вывода - ".cvc"/".txt"
 def func(width, height, path, input_colors, format_to_save, block_size):
 
-    global_h=height
-    global_w=width
-    global_input_colors = input_colors
     img_array = np.array(Image.open(path))  # Загрузка RGB-изображения и преобразование в массив
     rgb_image = np.zeros((height, width, 3), dtype=np.uint8) # массив для нового изображения в формате RGB
     info_table = {} #словарь для хранения инфы о плиточках(цвет, количество и координаты)
-
     #создаем картину
     for y in range(height):
         for x in range(width):
@@ -284,6 +274,12 @@ def func(width, height, path, input_colors, format_to_save, block_size):
                 info_table[nearest_color] = {"count": 0, "coordinates": []}
             info_table[nearest_color]["count"] += 1
             info_table[nearest_color]["coordinates"].append((x, y))
+
+    config.global_img = rgb_image
+    config.global_w = width
+    config.global_h = height
+
+    print(config.global_img, config.global_w, config.global_h)
 
     ### таблицы тоже должны создаваться по требованию а не каждый раз ###
     ###save_tile_info(info_table)
