@@ -5,6 +5,8 @@ from PyQt5.QtGui import QColor, QPainter, QFont, QPainterPath
 from PyQt5.QtCore import Qt, QRectF
 
 
+
+
 class ColorButton(QPushButton):
     def __init__(self, color):
         super().__init__()
@@ -59,6 +61,8 @@ class ColorButton(QPushButton):
 class ColorVisualizer(QWidget):
     def __init__(self, colors, flag_to_button=0):
         super().__init__()
+        self.setWindowFlag(Qt.WindowStaysOnTopHint)  # Окно поверх других
+        self.setAttribute(Qt.WA_DeleteOnClose, False)  # Не удалять при закрытии
         self.colors = colors
         self.flag = flag_to_button
         self.color_buttons = {}  # Словарь для хранения кнопок
@@ -93,7 +97,7 @@ class ColorVisualizer(QWidget):
             row_layout.addWidget(color_button)
 
         # Кнопка закрытия
-        close_btn = QPushButton("OK")
+        close_btn = QPushButton("CLOSE")
         close_btn.setFont(QFont("Candara", 10))
         close_btn.setStyleSheet("""
             QPushButton {
@@ -137,23 +141,43 @@ class ColorVisualizer(QWidget):
             event.accept()
 
 
-if __name__ == '__main__':
-    input_colors = [
-        (255, 0, 0),
-        (0, 255, 0),
-        (0, 0, 255),
-        (128, 128, 128),
-        (255, 255, 0),
-        (255, 0, 255),
-        (0, 255, 255),
-        (192, 192, 192),
-        (128, 0, 0),
-        (0, 128, 0),
-        (0, 0, 0),
-        (255, 255, 255)
-    ]
+def show_palette(input_colors):
+    # Проверяем, существует ли уже экземпляр QApplication
+    app = QApplication.instance()
+    if not app:
+        app = QApplication(sys.argv)
 
-    app = QApplication(sys.argv)
+    # Создаем окно
     visualizer = ColorVisualizer(input_colors)
+    visualizer.setAttribute(Qt.WA_DeleteOnClose, False)
+
+    # Показываем окно
     visualizer.show()
-    sys.exit(app.exec_())
+
+    # Если это первый вызов (нет существующего QApplication), запускаем event loop
+    if not QApplication.instance():
+        sys.exit(app.exec_())
+
+from PyQt5.QtCore import QTimer
+
+
+def show_palette_nonblocking(colors):
+    # Проверяем существует ли QApplication
+    app = QApplication.instance()
+    if not app:
+        app = QApplication([])
+
+    # Создаем и настраиваем окно
+    visualizer = ColorVisualizer(colors, 1)
+    visualizer.setAttribute(Qt.WA_DeleteOnClose, False)
+
+    # Сохраняем ссылку на окно глобально
+    global _global_visualizer
+    _global_visualizer = visualizer
+
+    # Показываем окно
+    visualizer.show()
+
+    # Обрабатываем события Qt без блокировки
+    app.processEvents()
+    return visualizer

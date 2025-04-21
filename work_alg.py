@@ -1,11 +1,14 @@
 import math
 from typing import override
-from palette import ColorVisualizer
+from palette import show_palette, show_palette_nonblocking
 import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
 from matplotlib.backend_bases import MouseButton
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QApplication, QFileDialog, QMessageBox, QMainWindow
 import csv
+import sys
 
 #input_colors = [
         #(255, 0, 0),
@@ -18,6 +21,11 @@ import csv
 #height=367
 
 ##on_click()
+global_input_colors=[]
+size_of_button=14 # высота кнопок на итоговой картинке
+size_of_line = 2
+global_w=0
+global_h=0
 
 def process_rgb(r1, g1, b1, r2, g2, b2):
     y1 = 0.299 * r1 + 0.587 * g1 + 0.114 * b1
@@ -71,34 +79,33 @@ def save_tile_info(info_table, file_type='txt'):
                 file.write(f"Color:\n ({r}, {g}, {b})\nCount:\n {count}\nCoordinates:\n {coordinates}\n\n")
 
 def show_color(size, x1, y1, block):
-    res = np.zeros((size, size, 3), dtype=np.uint8)
-    block= block[::-1, :] # костыль
-    col = block[y1, x1] # цвет, который был нажат
-    print(x1, y1)
-    print(col)
-    for i in range(size):
-        for j in range(size):
-            #print(block[j][i])
-            if not np.array_equal(block[j, i], col): # если не тот цвет, красим в черный
-                res[j][i] = (0, 0, 0)
-            else:
-                res[j][i] = block[j][i] # иначе сохраняеем цвет
 
-    res = res[::-1, :] # костыль, не спрашивайте...
+        x1 = math.floor(x1)
+        y1 = math.floor(y1)
 
-    plt.figure(figsize=(5, 5), facecolor='lightgray')
-    plt.imshow(res, extent=[0, size, 0, size])
-    plt.show()
+        res = np.zeros((size, size, 3), dtype=np.uint8)
+        col = block[y1, x1]  # цвет, который был нажат
+        for i in range(size):
+            for j in range(size):
+                if not np.array_equal(block[j, i], col):  # если не тот цвет, красим в черный
+                    res[j][i] = (0, 0, 0)
+                else:
+                    res[j][i] = block[j][i]  # иначе сохраняеем цвет
 
+        plt.figure(figsize=(5, 5), facecolor='lightgray')
+        plt.imshow(res, extent=[0, size, size, 0])
 
+        plt.gca().xaxis.set_ticks_position('top')  # Метки оси X наверх
+        plt.gca().xaxis.set_label_position('top')  # Подпись оси X наверх
+        plt.gca().spines['bottom'].set_visible(False)  # Скрываем нижнюю ось X
+        plt.gca().spines['top'].set_visible(True)
+
+        plt.show(block=False)
 
 def get_square_by_coordinate(x, y, height, width, size_of_square, img):
     x_real_coord = x*size_of_square
     y_real_coord = y*size_of_square
-    print(x_real_coord, y_real_coord)
-    img = img[::-1, :] ### костыль тк из-за extent[0,width*2, 0, height] поменялись координаты y
     rgb_image = np.zeros((size_of_square, size_of_square, 3), dtype=np.uint8)
-    #one_color_img = np.zeros((size_of_square, size_of_square, 3), dtype=np.uint8)
     color_counts = {}
     for y_real in range(size_of_square):
         for x_real in range (size_of_square):
@@ -111,17 +118,21 @@ def get_square_by_coordinate(x, y, height, width, size_of_square, img):
             else:
                 rgb_image[y_real, x_real] = (0,0,0)
 
-    rgb_image = rgb_image[::-1, :] ### костыль тк из-за extent[0,width*2, 0, height] поменялись координаты y
-
     def on_click_square(event):
         if event.button == MouseButton.LEFT:
-            print(event.xdata, event.ydata)
-            show_color(size_of_square, math.floor(event.xdata), math.floor(event.ydata), rgb_image)
+            show_color(size_of_square, event.xdata, event.ydata, rgb_image)
+
 
     fig=plt.figure(figsize=(5, 5), facecolor='lightgray')
-    plt.imshow(rgb_image, extent=[0, size_of_square, 0, size_of_square])
+    plt.imshow(rgb_image, extent=[0, size_of_square, size_of_square, 0])
+
+    plt.gca().xaxis.set_ticks_position('top')  # Метки оси X наверх
+    plt.gca().xaxis.set_label_position('top')  # Подпись оси X наверх
+    plt.gca().spines['bottom'].set_visible(False)  # Скрываем нижнюю ось X
+    plt.gca().spines['top'].set_visible(True)
+
     fig.canvas.mpl_connect('button_press_event', on_click_square)
-    plt.show()
+    plt.show(block=False)
 
     ### файлы должны создаваться только по потребности ###
     """
@@ -143,30 +154,97 @@ def get_square_by_coordinate(x, y, height, width, size_of_square, img):
     """
 
 def drow_grid(w, h, size):
+    ymin_new=(size_of_button+size_of_line)/(size_of_button+size_of_line+h)
     for x in range(0, w, size):
-        plt.axvline(x=x, ymin=0, ymax=1,
+        plt.axvline(x=x, ymin=ymin_new, ymax=1,
                 color="#db2c2c")
     for y in range(0, h, size):
         plt.axhline(y=y, xmin=0, xmax=1, color="#db2c2c")
 
 
-def show_main_pic(height, rgb_image, size_of_square, width):
+def show_main_pic(height, rgb_image, size_of_square, width, input_colors):
     def on_click_main(event):
+
         if event.button is MouseButton.LEFT:
             if event.xdata != None and event.ydata != None and event.xdata > 0 and event.ydata > 0:
-                print(event.xdata, event.ydata)
-                get_square_by_coordinate(
-                    int(event.xdata // size_of_square),
-                    int(event.ydata // size_of_square),
-                    height, width,
-                    size_of_square,
-                    rgb_image)
+                if (event.ydata<=height):
+                    get_square_by_coordinate(
+                        int(event.xdata // size_of_square),
+                        int(event.ydata // size_of_square),
+                        height, width,
+                        size_of_square,
+                        rgb_image)
+                else: # кнопки
+                    if (event.xdata < int(width/2)-1):
+                        # Создаем QApplication если его нет
+                        app = QApplication.instance() or QApplication([])
+                        show_palette_nonblocking(input_colors)
+                        # Периодически обрабатываем события Qt
+                        from PyQt5.QtCore import QTimer
+                        timer = QTimer()
+                        timer.timeout.connect(lambda: app.processEvents())
+                        timer.start(100)  # Обновляем каждые 100 мс
+                    elif (event.xdata > int(width/2)+1):
+                        print("save")
 
-    plt.figure(figsize=(11, 12), facecolor='lightgray')
+    width1=0 # левая кнопка
+    width2 = 0 # правая кнопка
+    width3=0 # разделитель
+    if width%2==0:
+        width1 =width/2-1
+        width2 = width/2-1
+        width3=2
+    else:
+        width1 = int(width / 2)-1
+        width2 = int(width / 2)-1
+        width3=3
+    but1 = np.zeros((size_of_button, width1, 3), dtype=np.uint8)
+    for i in but1:
+        for j in i:
+            j[0] = 151
+            j[1] = 94
+            j[2] = 89
+    sep=np.zeros((size_of_button, width3, 3), dtype=np.uint8)
+    for i in sep:
+        for j in i:
+            j[0] = 211
+            j[1] = 211
+            j[2] = 211
+    tmp=np.concatenate((but1, sep), axis=1)
+    but2 = np.zeros((size_of_button, width2, 3), dtype=np.uint8)
+    for i in but2:
+        for j in i:
+            j[0] = 151
+            j[1] = 94
+            j[2] = 89
+
+    save_or_color = np.concatenate((tmp, but2), axis=1)
+
+    line = np.zeros((size_of_line, width, 3), dtype=np.uint8)
+    for i in line:
+        for j in i:
+            j[0] = 211
+            j[1] = 211
+            j[2] = 211
+    save_or_color=np.concatenate((line, save_or_color), axis=0)
+
+    result_img = np.concatenate((rgb_image, save_or_color), axis=0)
+
+    plt.figure(figsize=(8, 9), facecolor='lightgray')
     plt.connect('button_press_event', on_click_main)
+
     drow_grid(width, height, size_of_square)  # отображаем сетку блоков
-    plt.imshow(rgb_image, extent=[0, width, 0, height])
-    plt.show()
+
+
+    #result_img=rgb_image
+    plt.imshow(result_img, extent=[0, width, height+size_of_button+size_of_line, 0])
+
+    plt.gca().xaxis.set_ticks_position('top')  # Метки оси X наверх
+    plt.gca().xaxis.set_label_position('top')  # Подпись оси X наверх
+    plt.gca().spines['bottom'].set_visible(False)  # Скрываем нижнюю ось X
+    plt.gca().spines['top'].set_visible(True)
+
+    plt.show(block=False)
 
 
 #Вот эта функция типа итоговая она привязана к кнопке generate - т.е. вы можете менять тут че хотите но генерация
@@ -174,9 +252,11 @@ def show_main_pic(height, rgb_image, size_of_square, width):
 #!!!добавила переменные отвечающие за размер блока и формат вывода - ".cvc"/".txt"
 def func(width, height, path, input_colors, format_to_save, block_size):
 
+    global_h=height
+    global_w=width
+    global_input_colors = input_colors
     img_array = np.array(Image.open(path))  # Загрузка RGB-изображения и преобразование в массив
     rgb_image = np.zeros((height, width, 3), dtype=np.uint8) # массив для нового изображения в формате RGB
-
     info_table = {} #словарь для хранения инфы о плиточках(цвет, количество и координаты)
 
     #создаем картину
@@ -222,13 +302,13 @@ def func(width, height, path, input_colors, format_to_save, block_size):
     for i in red_half:
         for idx, j in enumerate(i):
             if idx > width/2 + 1:
-                j[0] = 199
-                j[1] = 22
-                j[2] = 40
+                j[0] = 175
+                j[1] = 64
+                j[2] = 53
             elif idx < width / 2 - 1:
-                j[0] = 22
-                j[1] = 199
-                j[2] = 40
+                j[0] = 122
+                j[1] = 169
+                j[2] = 82
             else:
                 j[0] = 211
                 j[1] = 211
@@ -243,10 +323,9 @@ def func(width, height, path, input_colors, format_to_save, block_size):
     def on_click(event):
         if event.button is MouseButton.LEFT:
             if event.xdata!=None and event.ydata!=None and event.xdata>width and event.ydata>0:
-                print(event.xdata, event.ydata, width)
                 if event.ydata <= 13 and event.xdata > width and event.xdata < width+ width/2 -1:
                     plt.close("all")
-                    show_main_pic(height, rgb_image, size_of_square, width)
+                    show_main_pic(height, rgb_image, size_of_square, width, input_colors)
 
                 if event.ydata <= 13 and event.xdata > width + width/2 + 1 and event.xdata < width *2:
                     plt.close("all")
@@ -256,7 +335,5 @@ def func(width, height, path, input_colors, format_to_save, block_size):
     plt.imshow(result_img, extent=[0, width*2, 0, height+4])
     #drow_grid(width, height, size_of_square) #отображаем сетку блоков
     plt.axis('off')
-    plt.show()
-
-
+    plt.show(block=False)
 
