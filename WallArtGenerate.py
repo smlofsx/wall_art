@@ -111,5 +111,5 @@ class Ui_MainWindow(object):
         self.generateButton.setText(_translate("MainWindow", "GENERATE"))
         self.block_size.setText(_translate("MainWindow", "ENTER BLOCK SIZE"))
         self.label.setText(_translate("MainWindow", "SELECT THE IMAGE SAVING FORMAT:"))
-        self.select_format.setItemText(0, _translate("MainWindow", ".cvs"))
+        self.select_format.setItemText(0, _translate("MainWindow", ".xlsx"))
         self.select_format.setItemText(1, _translate("MainWindow", ".txt"))

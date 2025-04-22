@@ -7,9 +7,11 @@ from PIL import Image
 from matplotlib.backend_bases import MouseButton
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QFileDialog, QMessageBox, QMainWindow
-import csv
 import sys
 import config
+import pandas as pd
+import os
+
 
 #input_colors = [
         #(255, 0, 0),
@@ -60,24 +62,51 @@ def get_index_by_value(arr, value):
         return -1  # Если значение не найдено, возвращаем -1
 
 
+def save_tile_info(info_table, file_type='xlsx', file_name='info_table.xlsx'):
+    color_data = []
 
-def save_tile_info(info_table, file_type='txt'):
-    file_name = f"info_table.{file_type}"
-    if file_type == "txt":
-        with open(file_name, 'w') as file:
-            for color, info in info_table.items():
-                r, g, b = color
-                count = info['count']
-                coordinates = "; ".join([f"({x}, {y})" for x, y in info['coordinates']])
-                file.write(f"Color: ({r}, {g}, {b})\nCount: {count}\nCoordinates: {coordinates}\n\n")
+    for color, info in info_table.items():
+        r, g, b = color
+        # Если info - это просто количество, это ошибка, нужно подправить.
+        if isinstance(info, int):  # Проверка, если info — это количество
+            count = info  # Просто количество, без дополнительных данных
+            coordinates = []  # Координат не будет
+        else:
+            count = info.get('count', 0)  # Получаем количество
+            coordinates = info.get('coordinates', [])  # Получаем координаты
 
-    elif file_type == "csv":
-        with open(file_name, 'w') as file:
-            for color, info in info_table.items():
-                r, g, b = color
-                count = info['count']
-                coordinates = "; ".join([f"({x}, {y})" for x, y in info['coordinates']])
-                file.write(f"Color:\n ({r}, {g}, {b})\nCount:\n {count}\nCoordinates:\n {coordinates}\n\n")
+        # Добавляем первую строку с count
+        first = True
+        for coord in coordinates:
+            color_data.append({
+                'Color': f"({r}, {g}, {b})",
+                'Coordinate': f"({coord[0]}, {coord[1]})",
+                'Count': count if first else ""
+            })
+            first = False
+
+    df = pd.DataFrame(color_data)
+
+    if file_type == 'xlsx':
+        with pd.ExcelWriter(file_name, engine='openpyxl') as writer:
+            df.to_excel(writer, index=False, sheet_name='Sheet1')
+            worksheet = writer.sheets['Sheet1']
+            worksheet.column_dimensions['A'].width = 20  # Color
+            worksheet.column_dimensions['B'].width = 15  # Coordinate
+            worksheet.column_dimensions['C'].width = 10  # Count
+
+    #elif file_type == 'csv':
+        #df.to_csv(file_name, index=False)
+
+    elif file_type == 'txt':
+        with open(file_name, 'w', encoding='utf-8') as file:
+            # Заголовок таблицы
+            file.write(f"{'Color':<20} {'Coordinate':<15} {'Count':<10}\n")
+            file.write(f"{'-'*20} {'-'*15} {'-'*10}\n")
+
+            for _, row in df.iterrows():
+                file.write(f"{row['Color']:<20} {row['Coordinate']:<15} {str(row['Count']):<10}\n")
+
 
 def show_color(size, x1, y1, block): # вывод блока по цвету
 
@@ -109,18 +138,63 @@ def get_square_by_coordinate(x, y, height, width, size_of_square, img):
     rgb_image = np.zeros((size_of_square, size_of_square, 3), dtype=np.uint8)
     color_counts = {}
     for y_real in range(size_of_square):
-        for x_real in range (size_of_square):
-            if x_real+x_real_coord>=0 and x_real+x_real_coord<width and y_real+y_real_coord<height: # проверка на выход за границы изображения
-                rgb_image[y_real, x_real] = img[y_real+y_real_coord, x_real + x_real_coord]
-                color = tuple(img[y_real + y_real_coord, x_real + x_real_coord])  # RGB-кортеж
+        for x_real in range(size_of_square):
+            if x_real + x_real_coord >= 0 and x_real + x_real_coord < width and y_real + y_real_coord < height:
+                rgb_image[y_real, x_real] = img[y_real + y_real_coord, x_real + x_real_coord]
+
+                # Преобразуем np.uint8 цвета в обычный кортеж из целых чисел
+                color = tuple(map(int, img[y_real + y_real_coord, x_real + x_real_coord]))
+
+                # Инициализация словаря для каждого цвета, если его нет в color_counts
                 if color not in color_counts:
-                    color_counts[color] = 0
-                color_counts[color] += 1
+                    color_counts[color] = {'count': 0, 'coordinates': []}
+
+                # Обновляем количество и добавляем координаты
+                color_counts[color]['count'] += 1
+                color_counts[color]['coordinates'].append((x_real + x_real_coord, y_real + y_real_coord))
             else:
-                rgb_image[y_real, x_real] = (0,0,0)
+                rgb_image[y_real, x_real] = (0, 0, 0)
+    #!!!вот отсюда вывод по блокам как только на него тыкнем
+    """block_filename_base = f"block_{y}_{x}"
+    save_tile_info(color_counts, file_type='txt', file_name=f"{block_filename_base}.txt")
+    save_tile_info(color_counts, file_type='xlsx', file_name=f"{block_filename_base}.xlsx")"""
+
+
+#это для вывода матрицы тхт конкретного цвета
+    def save_block_info(rgb_image, color, size_of_square, x, y):
+        # Формируем матрицу 0 и 1
+        matrix = np.zeros((size_of_square, size_of_square), dtype=int)
+        for i in range(size_of_square):
+            for j in range(size_of_square):
+                if np.array_equal(rgb_image[i, j], color):
+                    matrix[i, j] = 1
+
+        r, g, b = color
+        color_str = f"({r}, {g}, {b})"
+
+        txt_filename = f"block_matrix_{y}_{x}.txt"
+        with open(txt_filename, 'w') as file:
+            file.write(f"Color: {color_str}\n")
+            file.write("Matrix:\n")
+
+            # Заголовок с номерами столбцов
+            file.write("    " + " ".join(f"{j:>3}" for j in range(size_of_square)) + "\n")
+
+            # Каждая строка с номером строки и выровненными значениями
+            for i, row in enumerate(matrix):
+                file.write(f"{i:>3} " + " ".join(f"{val:>3}" for val in row) + "\n")
+
 
     def on_click_square(event):
         if event.button == MouseButton.LEFT:
+            #для вывода конкретного цвета блока
+            '''x_coord = math.floor(event.xdata)  # Получаем координаты клика
+            y_coord = math.floor(event.ydata)
+
+            # Получаем цвет пикселя по этим координатам
+            color = tuple(rgb_image[y_coord, x_coord])  # Цвет пикселя
+            save_block_info(rgb_image, color, size_of_square, x_coord, y_coord)  # Сохраняем информацию
+            '''
             show_color(size_of_square, event.xdata, event.ydata, rgb_image)
 
 
@@ -135,24 +209,7 @@ def get_square_by_coordinate(x, y, height, width, size_of_square, img):
     fig.canvas.mpl_connect('button_press_event', on_click_square)
     plt.show(block=False)
 
-    ### файлы должны создаваться только по потребности ###
-    """
-    file_name = f"tile_info_{x}_{y}.csv"
-    with open(file_name, 'w') as file:
-        for color, count in color_counts.items():
-            r, g, b = color
-            # Собираем координаты для этого цвета в выделенной области
-            coordinates = "; ".join([f"({x_real}, {y_real})"
-                    for x_real in range(size_of_square)
-                    for y_real in range(size_of_square)
-                    if tuple(img[y_real + y_real_coord, x_real + x_real_coord]) == color])
 
-            # Записываем информацию о цвете, количестве и координатах в файл
-            file.write(f"Color:\n ({r}, {g}, {b})\nCount:\n {count}\nCoordinates:\n {coordinates}\n\n")
-
-    # Также можно вывести информацию в консоль или вернуть результат
-    print(f"Information for tile ({x}, {y}) saved to {file_name}.")
-    """
 
 def drow_grid(w, h, size):
     ymin_new=(size_of_button+size_of_line)/(size_of_button+size_of_line+h)
@@ -278,10 +335,14 @@ def func(width, height, path, input_colors, format_to_save, block_size):
     config.global_img = rgb_image
     config.global_w = width
     config.global_h = height
-
+    config.global_info_table = info_table
     ### таблицы тоже должны создаваться по требованию а не каждый раз ###
-    ###save_tile_info(info_table)
-    ###save_tile_info(info_table, 'csv')
+    #сто проц работает правильно
+    ### save_tile_info(info_table, 'xlsx')
+    ### save_tile_info(info_table, 'txt')
+    ### теперь при нажатии кнопки вызывать(только хз работает ли):
+    ### save_tile_info(config.global_info_table, 'xlsx')
+    ### save_tile_info(config.global_info_table, 'txt')
     ###print(img_array)
 
 

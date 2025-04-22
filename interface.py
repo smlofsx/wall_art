@@ -28,7 +28,7 @@ class MyApp(QMainWindow, Ui_MainWindow):
         self.height = None
         self.path = None
         self.input_colors = []
-        self.format_to_save = ".cvs"  # может быть еще .txt
+        self.format_to_save = ".xlsx"  # может быть еще .txt
 
     def load_image(self):
         # Открываем проводник для выбора изображения
