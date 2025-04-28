@@ -2,7 +2,12 @@ import math
 from typing import override
 from palette import show_palette, show_palette_nonblocking
 import numpy as np
+
+import matplotlib
+matplotlib.use('Qt5Agg')
+
 import matplotlib.pyplot as plt
+from matplotlib.widgets import Button
 from PIL import Image
 from matplotlib.backend_bases import MouseButton
 from PyQt5.QtCore import Qt
@@ -211,10 +216,10 @@ def get_square_by_coordinate(x, y, height, width, size_of_square, img):
 
 
 
-def drow_grid(w, h, size):
-    ymin_new=(size_of_button+size_of_line)/(size_of_button+size_of_line+h)
+def draw_grid(w, h, size):
+    #ymin_new=(size_of_button+size_of_line)/(size_of_button+size_of_line+h)
     for x in range(0, w, size):
-        plt.axvline(x=x, ymin=ymin_new, ymax=1,
+        plt.axvline(x=x, ymin=0, ymax=1,
                 color="#db2c2c")
     for y in range(0, h, size):
         plt.axhline(y=y, xmin=0, xmax=1, color="#db2c2c")
@@ -222,7 +227,6 @@ def drow_grid(w, h, size):
 
 def show_main_pic(height, rgb_image, size_of_square, width, input_colors):
     def on_click_main(event):
-
         if event.button is MouseButton.LEFT:
             if event.xdata != None and event.ydata != None and event.xdata > 0 and event.ydata > 0:
                 if (event.ydata<=height):
@@ -233,25 +237,7 @@ def show_main_pic(height, rgb_image, size_of_square, width, input_colors):
                         size_of_square,
                         rgb_image)
 
-                else: # кнопки
-                    global_h = height
-                    global_w = width
-                    global_img = rgb_image
-                    if (event.xdata < int(width/2)-1):
-                        # Создаем QApplication если его нет
-                        app = QApplication.instance() or QApplication([])
-                        show_palette_nonblocking(input_colors)
-                        # Периодически обрабатываем события Qt
-                        from PyQt5.QtCore import QTimer
-                        timer = QTimer()
-                        timer.timeout.connect(lambda: app.processEvents())
-                        timer.start(100)  # Обновляем каждые 100 мс
-
-                    elif (event.xdata > int(width/2)+1):
-                        print("save")
-                        #show_pic_by_color(rgb_image[1,1], rgb_image, width, height)
-
-    width1=0 # левая кнопка
+    '''width1=0 # левая кнопка
     width2 = 0 # правая кнопка
     width3=0 # разделитель
     if width%2==0:
@@ -292,23 +278,56 @@ def show_main_pic(height, rgb_image, size_of_square, width, input_colors):
             j[2] = 211
     save_or_color=np.concatenate((line, save_or_color), axis=0)
 
-    result_img = np.concatenate((rgb_image, save_or_color), axis=0)
+    result_img = np.concatenate((rgb_image, save_or_color), axis=0)'''
 
-    plt.figure(figsize=(8, 9), facecolor='lightgray')
-    plt.connect('button_press_event', on_click_main)
+    '''plt.figure(figsize=(8, 9), facecolor='lightgray')
+    plt.connect('button_press_event', on_click_main)'''
+    fig, ax = plt.subplots(figsize=(8, 9))
+    plt.subplots_adjust(bottom=0.2)
 
-    drow_grid(width, height, size_of_square)  # отображаем сетку блоков
-
+    draw_grid(width, height, size_of_square)  # отображаем сетку блоков
+    img_display = ax.imshow(rgb_image, extent=[0, width, height, 0])
 
     #result_img=rgb_image
-    plt.imshow(result_img, extent=[0, width, height+size_of_button+size_of_line, 0])
+    #plt.imshow(rgb_image, extent=[0, width, height, 0])
 
     plt.gca().xaxis.set_ticks_position('top')  # Метки оси X наверх
     plt.gca().xaxis.set_label_position('top')  # Подпись оси X наверх
     plt.gca().spines['bottom'].set_visible(False)  # Скрываем нижнюю ось X
     plt.gca().spines['top'].set_visible(True)
 
+    # Привязываем обработчик кликов
+    #fig.canvas.mpl_connect('button_press_event', on_click_main)
+
+    def on_show_palette(event):
+        print("Show Palette button clicked")
+        app = QApplication.instance() or QApplication([])
+        show_palette_nonblocking(input_colors)
+        # Периодически обрабатываем события Qt
+        from PyQt5.QtCore import QTimer
+        timer = QTimer()
+        timer.timeout.connect(lambda: app.processEvents())
+        timer.start(100)
+
+    def on_save(event):
+        print("Save button clicked")
+        # Здесь можно добавить логику сохранения изображения
+        # Например: plt.savefig("output.png")
+
+    # Создаем первую кнопку (Show Palette)
+    show_palette_ax = plt.axes([0.2, 0.05, 0.2, 0.075])  # [left, bottom, width, height]
+    show_palette_button = Button(show_palette_ax, 'Show Palette', color='lightblue')
+    show_palette_button.on_clicked(on_show_palette)
+
+    # Создаем вторую кнопку (Save)
+    save_ax = plt.axes([0.6, 0.05, 0.2, 0.075])  # [left, bottom, width, height]
+    save_button = Button(save_ax, 'Save', color='lightgreen')
+    save_button.on_clicked(on_save)
+
     plt.show(block=False)
+
+    while plt.fignum_exists(fig.number):  # Пока окно не закрыто
+        plt.pause(0.1)
 
 
 #Вот эта функция типа итоговая она привязана к кнопке generate - т.е. вы можете менять тут че хотите но генерация
@@ -352,7 +371,7 @@ def func(width, height, path, input_colors, format_to_save, block_size):
 
     result_img = np.concatenate((img_array, rgb_image), axis=1)
 
-    white_line = np.zeros((2, width*2, 3), dtype=np.uint8)
+    '''white_line = np.zeros((2, width*2, 3), dtype=np.uint8)
     for i in white_line:
         for j in i:
             j[0] = 211
@@ -383,25 +402,50 @@ def func(width, height, path, input_colors, format_to_save, block_size):
                 j[2] = 211
     yes_or_no = np.concatenate((green_half, red_half), axis = 1)
 
-    result_img = np.concatenate((result_img,yes_or_no), axis = 0)
-    plt.figure(figsize=(14, 7), facecolor='lightgray')
+    result_img = np.concatenate((result_img,yes_or_no), axis = 0)'''
+    #plt.figure(figsize=(14, 7), facecolor='lightgray')
 
-    #plt.axis([0, width * 2, 0, height])
-
-    def on_click(event):
+    '''def on_click(event):
         if event.button is MouseButton.LEFT:
             if event.xdata!=None and event.ydata!=None and event.xdata>width and event.ydata>0:
-                if event.ydata <= 13 and event.xdata > width and event.xdata < width+ width/2 -1:
+                if event.ydata <= 13 and event.xdata > width and event.xdata < width+ width/2 -1: # условие нажатия кнопки ок
                     plt.close("all")
                     show_main_pic(height, rgb_image, size_of_square, width, input_colors)
 
-                if event.ydata <= 13 and event.xdata > width + width/2 + 1 and event.xdata < width *2:
+                if event.ydata <= 13 and event.xdata > width + width/2 + 1 and event.xdata < width *2: # условие нажатия кнопки regeneretion
                     plt.close("all")
 
 
     plt.connect('button_press_event', on_click)
-    plt.imshow(result_img, extent=[0, width*2, 0, height+4])
-    #drow_grid(width, height, size_of_square) #отображаем сетку блоков
-    plt.axis('off')
+    plt.imshow(result_img, extent=[0, width*2, 0, height])
+    plt.axis('off')'''
+
+    fig, ax = plt.subplots(figsize=(14, 7))
+    plt.subplots_adjust(bottom=0.2)
+
+    img_display = ax.imshow(result_img)
+    ax.axis('off')
+
+    def on_continue(event):
+        print("continue")
+        plt.close("all")
+        show_main_pic(height, rgb_image, size_of_square, width, input_colors)
+
+    def on_goback(event):
+        print("go back")
+        plt.close("all")
+
+    # Создаем первую кнопку (Continue)
+    continue_ax = plt.axes([0.2, 0.05, 0.2, 0.075])  # [left, bottom, width, height]
+    continue_button = Button(continue_ax, 'Continue', color='lightgreen')
+    continue_button.on_clicked(on_continue)
+
+    # Создаем вторую кнопку (Go Back)
+    goback_ax = plt.axes([0.6, 0.05, 0.2, 0.075])  # [left, bottom, width, height]
+    goback_button = Button(goback_ax, 'Go Back', color='lightcoral')
+    goback_button.on_clicked(on_goback)
+
     plt.show(block=False)
+    while plt.fignum_exists(fig.number):  # Пока окно не закрыто
+        plt.pause(0.1)
 
