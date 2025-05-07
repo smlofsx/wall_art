@@ -32,6 +32,9 @@ import os
 global_input_colors=[]
 size_of_button=14 # высота кнопок на итоговой картинке
 size_of_line = 2
+global_block=0
+global_bl_col=0
+global_img_col=0
 
 
 def process_rgb(r1, g1, b1, r2, g2, b2):
@@ -114,7 +117,7 @@ def save_tile_info(info_table, file_type='xlsx', file_name='info_table.xlsx'):
 
 
 def show_color(size, x1, y1, block): # вывод блока по цвету
-
+        plt.close('all')
         x1 = math.floor(x1)
         y1 = math.floor(y1)
 
@@ -127,7 +130,7 @@ def show_color(size, x1, y1, block): # вывод блока по цвету
                 else:
                     res[j][i] = block[j][i]  # иначе сохраняеем цвет
 
-        plt.figure(figsize=(5, 5), facecolor='lightgray')
+        fig, ax=plt.subplots(figsize=(5, 5), facecolor='lightgray')
         plt.imshow(res, extent=[0, size, size, 0])
 
         plt.gca().xaxis.set_ticks_position('top')  # Метки оси X наверх
@@ -135,9 +138,34 @@ def show_color(size, x1, y1, block): # вывод блока по цвету
         plt.gca().spines['bottom'].set_visible(False)  # Скрываем нижнюю ось X
         plt.gca().spines['top'].set_visible(True)
 
-        plt.show(block=False)
+        # Создание кнопок
+        plt.subplots_adjust(bottom=0.3)  # Освобождаем место для кнопок
+
+        # Обработчики кнопок
+        def go_back(event):
+            print("Back")
+            plt.close('all')
+
+        def save_image(event):
+            print("Save")
+
+        # Создаем первую кнопку (Show Palette)
+        ax_btn_back = plt.axes([0.2, 0.1, 0.3, 0.1])  # [left, bottom, width, height]
+        show_palette_button = Button(ax_btn_back, 'Go back', color='lightblue')
+        show_palette_button.on_clicked(go_back)
+
+        # Создаем вторую кнопку (Save)
+        ax_btn_save = plt.axes([0.5, 0.1, 0.3, 0.1])  # [left, bottom, width, height]
+        save_button = Button(ax_btn_save, 'Save', color='lightgreen')
+        save_button.on_clicked(save_image)
+
+        plt.show()
+
+        while plt.fignum_exists(fig.number):  # Пока окно не закрыто
+            plt.pause(0.1)
 
 def get_square_by_coordinate(x, y, height, width, size_of_square, img):
+    plt.close('all')
     x_real_coord = x*size_of_square
     y_real_coord = y*size_of_square
     rgb_image = np.zeros((size_of_square, size_of_square, 3), dtype=np.uint8)
@@ -159,13 +187,15 @@ def get_square_by_coordinate(x, y, height, width, size_of_square, img):
                 color_counts[color]['coordinates'].append((x_real + x_real_coord, y_real + y_real_coord))
             else:
                 rgb_image[y_real, x_real] = (0, 0, 0)
+
+    global_block=rgb_image.copy()
     #!!!вот отсюда вывод по блокам как только на него тыкнем
     """block_filename_base = f"block_{y}_{x}"
     save_tile_info(color_counts, file_type='txt', file_name=f"{block_filename_base}.txt")
     save_tile_info(color_counts, file_type='xlsx', file_name=f"{block_filename_base}.xlsx")"""
 
 
-#это для вывода матрицы тхт конкретного цвета
+    #это для вывода матрицы тхт конкретного цвета
     def save_block_info(rgb_image, color, size_of_square, x, y):
         # Формируем матрицу 0 и 1
         matrix = np.zeros((size_of_square, size_of_square), dtype=int)
@@ -200,10 +230,11 @@ def get_square_by_coordinate(x, y, height, width, size_of_square, img):
             color = tuple(rgb_image[y_coord, x_coord])  # Цвет пикселя
             save_block_info(rgb_image, color, size_of_square, x_coord, y_coord)  # Сохраняем информацию
             '''
-            show_color(size_of_square, event.xdata, event.ydata, rgb_image)
+            if event.inaxes == ax:
+                show_color(size_of_square, event.xdata, event.ydata, rgb_image)
 
 
-    fig=plt.figure(figsize=(5, 5), facecolor='lightgray')
+    fig, ax = plt.subplots(figsize=(5,5), facecolor='lightgray')
     plt.imshow(rgb_image, extent=[0, size_of_square, size_of_square, 0])
 
     plt.gca().xaxis.set_ticks_position('top')  # Метки оси X наверх
@@ -211,8 +242,32 @@ def get_square_by_coordinate(x, y, height, width, size_of_square, img):
     plt.gca().spines['bottom'].set_visible(False)  # Скрываем нижнюю ось X
     plt.gca().spines['top'].set_visible(True)
 
+    # Создание кнопок
+    plt.subplots_adjust(bottom=0.3)  # Освобождаем место для кнопок
+
+    # Обработчики кнопок
+    def go_back(event):
+        print("Back")
+        plt.close('all')
+
+    def save_image(event):
+        print("Save")
+
+    # Создаем первую кнопку (Show Palette)
+    ax_btn_back = plt.axes([0.2, 0.1, 0.3, 0.1])   # [left, bottom, width, height]
+    show_palette_button = Button(ax_btn_back, 'Go back', color='lightblue')
+    show_palette_button.on_clicked(go_back)
+
+    # Создаем вторую кнопку (Save)
+    ax_btn_save = plt.axes([0.5, 0.1, 0.3, 0.1])  # [left, bottom, width, height]
+    save_button = Button(ax_btn_save, 'Save', color='lightgreen')
+    save_button.on_clicked(save_image)
+
     fig.canvas.mpl_connect('button_press_event', on_click_square)
-    plt.show(block=False)
+    plt.show()
+
+    while plt.fignum_exists(fig.number):  # Пока окно не закрыто
+        plt.pause(0.1)
 
 
 
@@ -228,7 +283,7 @@ def draw_grid(w, h, size):
 def show_main_pic(height, rgb_image, size_of_square, width, input_colors):
     def on_click_main(event):
         if event.button is MouseButton.LEFT:
-            if event.xdata != None and event.ydata != None and event.xdata > 0 and event.ydata > 0:
+            if event.inaxes == ax and event.xdata != None and event.ydata != None and event.xdata > 0 and event.ydata > 0:
                 if (event.ydata<=height):
                     get_square_by_coordinate(
                         int(event.xdata // size_of_square),
@@ -280,8 +335,6 @@ def show_main_pic(height, rgb_image, size_of_square, width, input_colors):
 
     result_img = np.concatenate((rgb_image, save_or_color), axis=0)'''
 
-    '''plt.figure(figsize=(8, 9), facecolor='lightgray')
-    plt.connect('button_press_event', on_click_main)'''
     fig, ax = plt.subplots(figsize=(8, 9))
     plt.subplots_adjust(bottom=0.2)
 
@@ -297,10 +350,11 @@ def show_main_pic(height, rgb_image, size_of_square, width, input_colors):
     plt.gca().spines['top'].set_visible(True)
 
     # Привязываем обработчик кликов
-    #fig.canvas.mpl_connect('button_press_event', on_click_main)
+    fig.canvas.mpl_connect('button_press_event', on_click_main)
 
     def on_show_palette(event):
         print("Show Palette button clicked")
+        plt.close('all')
         app = QApplication.instance() or QApplication([])
         show_palette_nonblocking(input_colors)
         # Периодически обрабатываем события Qt
@@ -308,6 +362,19 @@ def show_main_pic(height, rgb_image, size_of_square, width, input_colors):
         timer = QTimer()
         timer.timeout.connect(lambda: app.processEvents())
         timer.start(100)
+        #matplotlib
+        '''size=len(input_colors)
+        palette = np.zeros((10, size*10, 3), dtype=np.uint8)
+        for i, color in enumerate(input_colors):
+            x_start = i * 10
+            x_end = x_start + 10
+            palette[:, x_start:x_end] = color
+        fig = plt.figure(figsize=(5, 5), facecolor='lightgray')
+        plt.imshow(palette)
+        ax.axis('off')
+        plt.show()'''
+
+
 
     def on_save(event):
         print("Save button clicked")
@@ -324,10 +391,10 @@ def show_main_pic(height, rgb_image, size_of_square, width, input_colors):
     save_button = Button(save_ax, 'Save', color='lightgreen')
     save_button.on_clicked(on_save)
 
-    plt.show(block=False)
-
+    plt.show()
     while plt.fignum_exists(fig.number):  # Пока окно не закрыто
         plt.pause(0.1)
+
 
 
 #Вот эта функция типа итоговая она привязана к кнопке generate - т.е. вы можете менять тут че хотите но генерация
@@ -337,6 +404,11 @@ def func(width, height, path, input_colors, format_to_save, block_size):
 
     img_array = np.array(Image.open(path))  # Загрузка RGB-изображения и преобразование в массив
     rgb_image = np.zeros((height, width, 3), dtype=np.uint8) # массив для нового изображения в формате RGB
+
+    global_block = np.zeros((block_size, block_size, 3), dtype=np.uint8)
+    global_bl_col=np.zeros((block_size, block_size, 3), dtype=np.uint8)
+    global_img_col = np.zeros((height, width, 3), dtype=np.uint8)
+
     info_table = {} #словарь для хранения инфы о плиточках(цвет, количество и координаты)
     #создаем картину
     for y in range(height):
@@ -445,7 +517,7 @@ def func(width, height, path, input_colors, format_to_save, block_size):
     goback_button = Button(goback_ax, 'Go Back', color='lightcoral')
     goback_button.on_clicked(on_goback)
 
-    plt.show(block=False)
+    plt.show()
     while plt.fignum_exists(fig.number):  # Пока окно не закрыто
         plt.pause(0.1)
 
