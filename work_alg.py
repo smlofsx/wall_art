@@ -38,9 +38,6 @@ import os
 global_input_colors=[]
 size_of_button=14 # высота кнопок на итоговой картинке
 size_of_line = 2
-global_block=0
-global_bl_col=0
-global_img_col=0
 
 
 def process_rgb(r1, g1, b1, r2, g2, b2):
@@ -147,21 +144,12 @@ def show_color(size, x1, y1, block): # вывод блока по цвету
         # Создание кнопок
         plt.subplots_adjust(bottom=0.3)  # Освобождаем место для кнопок
 
-        # Обработчики кнопок
-        def go_back(event):
-            print("Back")
-            plt.close('all')
-
         def save_image(event):
+            # Сохранение
             print("Save")
 
-        # Создаем первую кнопку (Show Palette)
-        ax_btn_back = plt.axes([0.2, 0.1, 0.3, 0.1])  # [left, bottom, width, height]
-        show_palette_button = Button(ax_btn_back, 'Go back', color='lightblue')
-        show_palette_button.on_clicked(go_back)
-
         # Создаем вторую кнопку (Save)
-        ax_btn_save = plt.axes([0.5, 0.1, 0.3, 0.1])  # [left, bottom, width, height]
+        ax_btn_save = plt.axes([0.35, 0.1, 0.3, 0.1])  # [left, bottom, width, height]
         save_button = Button(ax_btn_save, 'Save', color='lightgreen')
         save_button.on_clicked(save_image)
 
@@ -251,21 +239,13 @@ def get_square_by_coordinate(x, y, height, width, size_of_square, img):
     # Создание кнопок
     plt.subplots_adjust(bottom=0.3)  # Освобождаем место для кнопок
 
-    # Обработчики кнопок
-    def go_back(event):
-        print("Back")
-        plt.close('all')
-
+    # Обработчик кнопок
     def save_image(event):
         print("Save")
+        # Сохранение
 
-    # Создаем первую кнопку (Show Palette)
-    ax_btn_back = plt.axes([0.2, 0.1, 0.3, 0.1])   # [left, bottom, width, height]
-    show_palette_button = Button(ax_btn_back, 'Go back', color='lightblue')
-    show_palette_button.on_clicked(go_back)
-
-    # Создаем вторую кнопку (Save)
-    ax_btn_save = plt.axes([0.5, 0.1, 0.3, 0.1])  # [left, bottom, width, height]
+    # Создаем кнопку (Save)
+    ax_btn_save = plt.axes([0.35, 0.1, 0.3, 0.1])  # [left, bottom, width, height]
     save_button = Button(ax_btn_save, 'Save', color='lightgreen')
     save_button.on_clicked(save_image)
 
@@ -299,49 +279,6 @@ def show_main_pic(height, rgb_image, size_of_square, width, input_colors):
                         size_of_square,
                         rgb_image)
 
-    '''width1=0 # левая кнопка
-    width2 = 0 # правая кнопка
-    width3=0 # разделитель
-    if width%2==0:
-        width1 =width/2-1
-        width2 = width/2-1
-        width3=2
-    else:
-        width1 = int(width / 2)-1
-        width2 = int(width / 2)-1
-        width3=3
-    but1 = np.zeros((size_of_button, width1, 3), dtype=np.uint8)
-    for i in but1:
-        for j in i:
-            j[0] = 151
-            j[1] = 94
-            j[2] = 89
-    sep=np.zeros((size_of_button, width3, 3), dtype=np.uint8)
-    for i in sep:
-        for j in i:
-            j[0] = 211
-            j[1] = 211
-            j[2] = 211
-    tmp=np.concatenate((but1, sep), axis=1)
-    but2 = np.zeros((size_of_button, width2, 3), dtype=np.uint8)
-    for i in but2:
-        for j in i:
-            j[0] = 151
-            j[1] = 94
-            j[2] = 89
-
-    save_or_color = np.concatenate((tmp, but2), axis=1)
-
-    line = np.zeros((size_of_line, width, 3), dtype=np.uint8)
-    for i in line:
-        for j in i:
-            j[0] = 211
-            j[1] = 211
-            j[2] = 211
-    save_or_color=np.concatenate((line, save_or_color), axis=0)
-
-    result_img = np.concatenate((rgb_image, save_or_color), axis=0)'''
-
     fig, ax = plt.subplots(figsize=(8, 9))
     plt.subplots_adjust(bottom=0.2)
 
@@ -366,24 +303,10 @@ def show_main_pic(height, rgb_image, size_of_square, width, input_colors):
         app.processEvents()
         show_palette_nonblocking(input_colors)
         fig.set_visible(True)
-        #matplotlib
-        '''size=len(input_colors)
-        palette = np.zeros((10, size*10, 3), dtype=np.uint8)
-        for i, color in enumerate(input_colors):
-            x_start = i * 10
-            x_end = x_start + 10
-            palette[:, x_start:x_end] = color
-        fig = plt.figure(figsize=(5, 5), facecolor='lightgray')
-        plt.imshow(palette)
-        ax.axis('off')
-        plt.show()'''
-
-
 
     def on_save(event):
         print("Save button clicked")
-        # Здесь можно добавить логику сохранения изображения
-        # Например: plt.savefig("output.png")
+        # Сохранение
 
     # Создаем первую кнопку (Show Palette)
     show_palette_ax = plt.axes([0.2, 0.05, 0.2, 0.075])  # [left, bottom, width, height]
@@ -409,10 +332,6 @@ def func(width, height, path, input_colors, format_to_save, block_size):
 
     img_array = np.array(Image.open(path))  # Загрузка RGB-изображения и преобразование в массив
     rgb_image = np.zeros((height, width, 3), dtype=np.uint8) # массив для нового изображения в формате RGB
-
-    global_block = np.zeros((block_size, block_size, 3), dtype=np.uint8)
-    global_bl_col=np.zeros((block_size, block_size, 3), dtype=np.uint8)
-    global_img_col = np.zeros((height, width, 3), dtype=np.uint8)
 
     info_table = {} #словарь для хранения инфы о плиточках(цвет, количество и координаты)
     #создаем картину
@@ -447,55 +366,6 @@ def func(width, height, path, input_colors, format_to_save, block_size):
     size_of_square = block_size
 
     result_img = np.concatenate((img_array, rgb_image), axis=1)
-
-    '''white_line = np.zeros((2, width*2, 3), dtype=np.uint8)
-    for i in white_line:
-        for j in i:
-            j[0] = 211
-            j[1] = 211
-            j[2] = 211 #я не знаю почему если написать = [255, 255, 255] оно не приравнивается нормально
-    # добавим белую линию после изображения
-    result_img = np.concatenate((result_img,white_line), axis = 0)
-    green_half = np.zeros((16, width, 3), dtype=np.uint8)
-    for i in green_half:
-        for j in i:
-            j[0] = 211
-            j[1] = 211
-            j[2] = 211
-    red_half = np.zeros((16, width, 3), dtype=np.uint8)
-    for i in red_half:
-        for idx, j in enumerate(i):
-            if idx > width/2 + 1:
-                j[0] = 175
-                j[1] = 64
-                j[2] = 53
-            elif idx < width / 2 - 1:
-                j[0] = 122
-                j[1] = 169
-                j[2] = 82
-            else:
-                j[0] = 211
-                j[1] = 211
-                j[2] = 211
-    yes_or_no = np.concatenate((green_half, red_half), axis = 1)
-
-    result_img = np.concatenate((result_img,yes_or_no), axis = 0)'''
-    #plt.figure(figsize=(14, 7), facecolor='lightgray')
-
-    '''def on_click(event):
-        if event.button is MouseButton.LEFT:
-            if event.xdata!=None and event.ydata!=None and event.xdata>width and event.ydata>0:
-                if event.ydata <= 13 and event.xdata > width and event.xdata < width+ width/2 -1: # условие нажатия кнопки ок
-                    plt.close("all")
-                    show_main_pic(height, rgb_image, size_of_square, width, input_colors)
-
-                if event.ydata <= 13 and event.xdata > width + width/2 + 1 and event.xdata < width *2: # условие нажатия кнопки regeneretion
-                    plt.close("all")
-
-
-    plt.connect('button_press_event', on_click)
-    plt.imshow(result_img, extent=[0, width*2, 0, height])
-    plt.axis('off')'''
 
     fig, ax = plt.subplots(figsize=(14, 7))
     plt.subplots_adjust(bottom=0.2)

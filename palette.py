@@ -8,6 +8,7 @@ from PyQt5.QtCore import Qt, QRectF
 import numpy as np
 import matplotlib.pyplot as plt
 import config
+from matplotlib.widgets import Button
 
 
 def show_pic_by_color(color, img, width, height):
@@ -19,6 +20,7 @@ def show_pic_by_color(color, img, width, height):
     else:
         # Создаем новое окно с уникальным менеджером
         show_pic_by_color.window = plt.figure(figsize=(8, 9))
+
         ax = show_pic_by_color.window.add_subplot(111)
         show_pic_by_color.window.canvas.manager.set_window_title('Color View')
 
@@ -33,14 +35,26 @@ def show_pic_by_color(color, img, width, height):
     ax.imshow(res, extent=[0, width, height, 0])
     ax.set_title(f"Color: {color}")
 
+    plt.subplots_adjust(bottom=0.3)  # Освобождаем место для кнопок
+    def save_image(event):
+        print("Save")
+        # Сохранение
+
+    ax_btn_save = plt.axes([0.35, 0.1, 0.3, 0.1])  # [left, bottom, width, height]
+    save_button = Button(ax_btn_save, 'Save', color='lightgreen')
+    save_button.on_clicked(save_image)
+
     # Настройки для плавного отображения
-    plt.tight_layout()
+    #plt.tight_layout()
     plt.show(block=False)
 
     # Важно: обрабатываем события PyQt
     app = QApplication.instance()
     if app:
         app.processEvents()
+
+    while plt.fignum_exists(show_pic_by_color.window.number):  # Пока окно не закрыто
+        plt.pause(0.01)
 
     return show_pic_by_color.window
 
