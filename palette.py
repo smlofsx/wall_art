@@ -1,4 +1,6 @@
 import sys
+from functools import lru_cache
+
 from PyQt5.QtWidgets import (QApplication, QWidget, QVBoxLayout, QHBoxLayout,
                              QPushButton, QLabel)
 from PyQt5.QtGui import QColor, QPainter, QFont, QPainterPath
@@ -8,18 +10,39 @@ import matplotlib.pyplot as plt
 import config
 
 
-def show_pic_by_color(color, img, width, height): # вывод всей картинки по цвету
-    res=np.zeros((height, width, 3), dtype=np.uint8)
+def show_pic_by_color(color, img, width, height):
+    # Проверяем, есть ли уже открытое окно
+    if hasattr(show_pic_by_color, 'window') and plt.fignum_exists(show_pic_by_color.window.number):
+        # Если окно существует, просто обновляем его содержимое
+        ax = show_pic_by_color.window.axes[0]
+        ax.clear()
+    else:
+        # Создаем новое окно с уникальным менеджером
+        show_pic_by_color.window = plt.figure(figsize=(8, 9))
+        ax = show_pic_by_color.window.add_subplot(111)
+        show_pic_by_color.window.canvas.manager.set_window_title('Color View')
 
-    for y in range(height):
-        for x in range(width):
-            if not np.array_equal(img[y, x], color):  # если не тот цвет, красим в черный
-                res[y][x] = (0, 0, 0)
-            else:
-                res[y][x] = img[y][x]
-    plt.figure(figsize=(8, 9), facecolor='lightgray')
-    plt.imshow(res, extent=[0, width, height, 0])
+        # Преобразуем цвет в кортеж, если это массив
+
+    # Оптимизированное создание изображения
+    res = np.zeros((height, width, 3), dtype=np.uint8)
+    color_array = np.array(color, dtype=np.uint8)  # Преобразуем кортеж в массив
+    mask = np.all(img == color_array, axis=2)  # Теперь сравнение корректно
+    res[mask] = color
+
+    ax.imshow(res, extent=[0, width, height, 0])
+    ax.set_title(f"Color: {color}")
+
+    # Настройки для плавного отображения
+    plt.tight_layout()
     plt.show(block=False)
+
+    # Важно: обрабатываем события PyQt
+    app = QApplication.instance()
+    if app:
+        app.processEvents()
+
+    return show_pic_by_color.window
 
 
 class ColorButton(QPushButton):
@@ -82,6 +105,7 @@ class ColorVisualizer(QWidget):
         self.flag = flag_to_button
         self.color_buttons = {}  # Словарь для хранения кнопок
         self.initUI()
+        self.matplotlib_figures = []  # Для хранения открытых фигур
 
     def initUI(self):
         self.setWindowTitle('Визуализатор цветов RGB')
@@ -134,15 +158,32 @@ class ColorVisualizer(QWidget):
         self.drag_position = None
 
     def on_color_clicked(self, brightness_key):
-        """Обработчик нажатия на цветную кнопку"""
-        button = self.color_buttons[brightness_key]
-        color = r, g, b = button.color.red(), button.color.green(), button.color.blue()
-        if self.flag == 0:
-            print(f"Clicked color: RGB({r}, {g}, {b}), Brightness key: {brightness_key}")
-        else:
-            print(color, config.global_img, config.global_w, config.global_h)
-            show_pic_by_color(color, config.global_img, config.global_w, config.global_h)
+        try:
+            button = self.color_buttons[brightness_key]
+            color = (button.color.red(), button.color.green(), button.color.blue())
+            if not hasattr(config, 'global_img'):
+                return
 
+            # Закрываем предыдущее окно если оно есть
+            if hasattr(self, '_current_fig') and plt.fignum_exists(self._current_fig.number):
+                plt.close(self._current_fig)
+
+            # Создаем новое окно
+            self._current_fig = show_pic_by_color(color, config.global_img,
+                                                  config.global_w, config.global_h)
+
+            # Принудительно обрабатываем события
+            QApplication.processEvents()
+
+        except Exception as e:
+            print(f"Error in color click: {str(e)}")
+
+            # Можно добавить QMessageBox с предупреждением об ошибке
+
+    def closeEvent(self, event):
+        if hasattr(self, '_current_fig') and self._current_fig:
+            plt.close(self._current_fig)
+        event.accept()
 
 
     def mousePressEvent(self, event):

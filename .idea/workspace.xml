@@ -4,10 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2bdc7d0c-71d8-484f-acad-26f1a7788f7a" name="Changes" comment="в палитре квадратики теперь кнопки">
-      <change afterPath="$PROJECT_DIR$/config.py" afterDir="false" />
+    <list default="true" id="2bdc7d0c-71d8-484f-acad-26f1a7788f7a" name="Changes" comment="доделала вывод фулл картинки по одному цвету">
+      <change afterPath="$PROJECT_DIR$/mplwidget.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/interface.py" beforeDir="false" afterPath="$PROJECT_DIR$/interface.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/palette.py" beforeDir="false" afterPath="$PROJECT_DIR$/palette.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/work_alg.py" beforeDir="false" afterPath="$PROJECT_DIR$/work_alg.py" afterDir="false" />
     </list>
@@ -26,7 +25,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="interface_ver2" />
+        <entry key="$PROJECT_DIR$" value="print_by_color" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -55,9 +54,10 @@
   &quot;keyToString&quot;: {
     &quot;Python.interface.executor&quot;: &quot;Run&quot;,
     &quot;Python.palette.executor&quot;: &quot;Run&quot;,
+    &quot;Python.work_alg.executor&quot;: &quot;Run&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;print__by__color&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;pbc__buttons&quot;,
     &quot;last_opened_file_path&quot;: &quot;C:/Users/User/PycharmProjects/wall_art_new&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
   }
@@ -160,7 +160,23 @@
       <option name="project" value="LOCAL" />
       <updated>1745150692067</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="доделала вывод фулл картинки по одному цвету">
+      <option name="closed" value="true" />
+      <created>1745262428781</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1745262428781</updated>
+    </task>
+    <task id="LOCAL-00011" summary="доделала вывод фулл картинки по одному цвету">
+      <option name="closed" value="true" />
+      <created>1745262550727</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1745262550727</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -184,6 +200,7 @@
     <MESSAGE value="визуализация палитры" />
     <MESSAGE value="палитра побольше для тестов" />
     <MESSAGE value="в палитре квадратики теперь кнопки" />
-    <option name="LAST_COMMIT_MESSAGE" value="в палитре квадратики теперь кнопки" />
+    <MESSAGE value="доделала вывод фулл картинки по одному цвету" />
+    <option name="LAST_COMMIT_MESSAGE" value="доделала вывод фулл картинки по одному цвету" />
   </component>
 </project>

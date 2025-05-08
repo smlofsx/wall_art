@@ -7,6 +7,12 @@ import matplotlib
 matplotlib.use('Qt5Agg')
 
 import matplotlib.pyplot as plt
+
+# Настройка для уменьшения мигания
+plt.rcParams['figure.raise_window'] = False  # Предотвращает поднятие окна на передний план
+plt.rcParams['toolbar'] = 'None'  # Отключаем toolbar для ускорения
+
+
 from matplotlib.widgets import Button
 from PIL import Image
 from matplotlib.backend_bases import MouseButton
@@ -59,7 +65,8 @@ def find_nearest_value(r1, g1, b1, results):
             minimal_distance = current
             index_of_color = idx
 
-    return results[index_of_color]
+    nearest = results[index_of_color]
+    return tuple(map(int, nearest))  # Явно возвращаем кортеж
 
 def get_index_by_value(arr, value):
     # Возвращает индекс первого вхождения value в массиве arr
@@ -117,7 +124,6 @@ def save_tile_info(info_table, file_type='xlsx', file_name='info_table.xlsx'):
 
 
 def show_color(size, x1, y1, block): # вывод блока по цвету
-        plt.close('all')
         x1 = math.floor(x1)
         y1 = math.floor(y1)
 
@@ -159,13 +165,13 @@ def show_color(size, x1, y1, block): # вывод блока по цвету
         save_button = Button(ax_btn_save, 'Save', color='lightgreen')
         save_button.on_clicked(save_image)
 
-        plt.show()
+        plt.show(block=False)
+        plt.pause(0.01)  # Даем время на инициализацию окна
 
         while plt.fignum_exists(fig.number):  # Пока окно не закрыто
-            plt.pause(0.1)
+            plt.pause(0.01)
 
 def get_square_by_coordinate(x, y, height, width, size_of_square, img):
-    plt.close('all')
     x_real_coord = x*size_of_square
     y_real_coord = y*size_of_square
     rgb_image = np.zeros((size_of_square, size_of_square, 3), dtype=np.uint8)
@@ -264,10 +270,11 @@ def get_square_by_coordinate(x, y, height, width, size_of_square, img):
     save_button.on_clicked(save_image)
 
     fig.canvas.mpl_connect('button_press_event', on_click_square)
-    plt.show()
+    plt.show(block=False)
+    plt.pause(0.01)  # Даем время на инициализацию окна
 
     while plt.fignum_exists(fig.number):  # Пока окно не закрыто
-        plt.pause(0.1)
+        plt.pause(0.01)
 
 
 
@@ -354,14 +361,11 @@ def show_main_pic(height, rgb_image, size_of_square, width, input_colors):
 
     def on_show_palette(event):
         print("Show Palette button clicked")
-        plt.close('all')
+        fig.set_visible(False)
         app = QApplication.instance() or QApplication([])
+        app.processEvents()
         show_palette_nonblocking(input_colors)
-        # Периодически обрабатываем события Qt
-        from PyQt5.QtCore import QTimer
-        timer = QTimer()
-        timer.timeout.connect(lambda: app.processEvents())
-        timer.start(100)
+        fig.set_visible(True)
         #matplotlib
         '''size=len(input_colors)
         palette = np.zeros((10, size*10, 3), dtype=np.uint8)
@@ -391,9 +395,10 @@ def show_main_pic(height, rgb_image, size_of_square, width, input_colors):
     save_button = Button(save_ax, 'Save', color='lightgreen')
     save_button.on_clicked(on_save)
 
-    plt.show()
+    plt.show(block=False)
+    plt.pause(0.01)  # Даем время на инициализацию окна
     while plt.fignum_exists(fig.number):  # Пока окно не закрыто
-        plt.pause(0.1)
+        plt.pause(0.01)
 
 
 
@@ -517,7 +522,8 @@ def func(width, height, path, input_colors, format_to_save, block_size):
     goback_button = Button(goback_ax, 'Go Back', color='lightcoral')
     goback_button.on_clicked(on_goback)
 
-    plt.show()
+    plt.show(block=False)
+    plt.pause(0.01)  # Даем время на инициализацию окна
     while plt.fignum_exists(fig.number):  # Пока окно не закрыто
-        plt.pause(0.1)
+        plt.pause(0.01)
 
