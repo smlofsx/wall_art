@@ -1,8 +1,9 @@
 import math
 from typing import override
+
+from config import info_table
 from palette import show_palette, show_palette_nonblocking
 import numpy as np
-
 import matplotlib
 matplotlib.use('Qt5Agg')
 
@@ -43,38 +44,30 @@ global_bl_col=0
 global_img_col=0
 
 
-def process_rgb(r1, g1, b1, r2, g2, b2):
-    y1 = 0.299 * r1 + 0.587 * g1 + 0.114 * b1
-    i1 = 0.569 * r1 + 0.274 * g1 + 0.321 * b1
-    q1 = 0.211 * r1 + 0.526 * g1 + 0.311 * b1
+#это для вывода матрицы тхт конкретного цвета
+def save_block_info(rgb_image, color, size_of_square, x, y):
+    # Формируем матрицу 0 и 1
+    matrix = np.zeros((size_of_square, size_of_square), dtype=int)
+    for i in range(size_of_square):
+        for j in range(size_of_square):
+            if np.array_equal(rgb_image[i, j], color):
+                matrix[i, j] = 1
 
-    y2 = 0.299 * r2 + 0.587 * g2 + 0.114 * b2
-    i2 = 0.569 * r2 + 0.274 * g2 + 0.321 * b2
-    q2 = 0.211 * r2 + 0.526 * g2 + 0.311 * b2
-    return y1-y2, i1-i2, q1-q2
+    r, g, b = color
+    color_str = f"({r}, {g}, {b})"
 
-# Функция для нахождения ближайшего значения из массива results
-def find_nearest_value(r1, g1, b1, results):
+    txt_filename = f"block_{config.temp_y}_{config.temp_x}_color_{color_str}.txt"
+    with open(txt_filename, 'w') as file:
+        file.write(f"Color: {color_str}\n")
+        file.write("Matrix:\n")
 
-    minimal_distance = 2000
-    index_of_color = 0
-    for idx, color in enumerate(results):
-        r2, g2, b2 = color
-        current = np.linalg.norm(process_rgb(r2, g2, b2, r1, g1, b1))
-        if minimal_distance > current:
-            minimal_distance = current
-            index_of_color = idx
+        # Заголовок с номерами столбцов
+        file.write("    " + " ".join(f"{j:>3}" for j in range(size_of_square)) + "\n")
 
-    nearest = results[index_of_color]
-    return tuple(map(int, nearest))  # Явно возвращаем кортеж
+        # Каждая строка с номером строки и выровненными значениями
+        for i, row in enumerate(matrix):
+            file.write(f"{i:>3} " + " ".join(f"{val:>3}" for val in row) + "\n")
 
-def get_index_by_value(arr, value):
-    # Возвращает индекс первого вхождения value в массиве arr
-    indices = np.where(arr == value)[0]  # np.where возвращает кортеж, берем первый элемент
-    if len(indices) > 0:
-        return indices[0]  # Возвращаем первый индекс
-    else:
-        return -1  # Если значение не найдено, возвращаем -1
 
 
 def save_tile_info(info_table, file_type='xlsx', file_name='info_table.xlsx'):
@@ -123,6 +116,47 @@ def save_tile_info(info_table, file_type='xlsx', file_name='info_table.xlsx'):
                 file.write(f"{row['Color']:<20} {row['Coordinate']:<15} {str(row['Count']):<10}\n")
 
 
+
+#-----------------------------------------------------------------------------------------------
+
+
+def process_rgb(r1, g1, b1, r2, g2, b2):
+    y1 = 0.299 * r1 + 0.587 * g1 + 0.114 * b1
+    i1 = 0.569 * r1 + 0.274 * g1 + 0.321 * b1
+    q1 = 0.211 * r1 + 0.526 * g1 + 0.311 * b1
+
+    y2 = 0.299 * r2 + 0.587 * g2 + 0.114 * b2
+    i2 = 0.569 * r2 + 0.274 * g2 + 0.321 * b2
+    q2 = 0.211 * r2 + 0.526 * g2 + 0.311 * b2
+    return y1-y2, i1-i2, q1-q2
+
+# Функция для нахождения ближайшего значения из массива results
+def find_nearest_value(r1, g1, b1, results):
+
+    minimal_distance = 2000
+    index_of_color = 0
+    for idx, color in enumerate(results):
+        r2, g2, b2 = color
+        current = np.linalg.norm(process_rgb(r2, g2, b2, r1, g1, b1))
+        if minimal_distance > current:
+            minimal_distance = current
+            index_of_color = idx
+
+    nearest = results[index_of_color]
+    return tuple(map(int, nearest))  # Явно возвращаем кортеж
+
+def get_index_by_value(arr, value):
+    # Возвращает индекс первого вхождения value в массиве arr
+    indices = np.where(arr == value)[0]  # np.where возвращает кортеж, берем первый элемент
+    if len(indices) > 0:
+        return indices[0]  # Возвращаем первый индекс
+    else:
+        return -1  # Если значение не найдено, возвращаем -1
+
+
+
+
+
 def show_color(size, x1, y1, block): # вывод блока по цвету
         x1 = math.floor(x1)
         y1 = math.floor(y1)
@@ -150,10 +184,12 @@ def show_color(size, x1, y1, block): # вывод блока по цвету
         # Обработчики кнопок
         def go_back(event):
             print("Back")
-            plt.close('all')
+            plt.close()
 
         def save_image(event):
             print("Save")
+            save_block_info(config.global_img, col, config.size_of_square, x1, y1)
+            #!!!!!!!!!!!
 
         # Создаем первую кнопку (Show Palette)
         ax_btn_back = plt.axes([0.2, 0.1, 0.3, 0.1])  # [left, bottom, width, height]
@@ -175,7 +211,7 @@ def get_square_by_coordinate(x, y, height, width, size_of_square, img):
     x_real_coord = x*size_of_square
     y_real_coord = y*size_of_square
     rgb_image = np.zeros((size_of_square, size_of_square, 3), dtype=np.uint8)
-    color_counts = {}
+
     for y_real in range(size_of_square):
         for x_real in range(size_of_square):
             if x_real + x_real_coord >= 0 and x_real + x_real_coord < width and y_real + y_real_coord < height:
@@ -185,57 +221,32 @@ def get_square_by_coordinate(x, y, height, width, size_of_square, img):
                 color = tuple(map(int, img[y_real + y_real_coord, x_real + x_real_coord]))
 
                 # Инициализация словаря для каждого цвета, если его нет в color_counts
-                if color not in color_counts:
-                    color_counts[color] = {'count': 0, 'coordinates': []}
+                if color not in config.color_counts:
+                    config.color_counts[color] = {'count': 0, 'coordinates': []}
 
                 # Обновляем количество и добавляем координаты
-                color_counts[color]['count'] += 1
-                color_counts[color]['coordinates'].append((x_real + x_real_coord, y_real + y_real_coord))
+                config.color_counts[color]['count'] += 1
+                config.color_counts[color]['coordinates'].append((x_real + x_real_coord, y_real + y_real_coord))
             else:
                 rgb_image[y_real, x_real] = (0, 0, 0)
 
     global_block=rgb_image.copy()
     #!!!вот отсюда вывод по блокам как только на него тыкнем
     """block_filename_base = f"block_{y}_{x}"
-    save_tile_info(color_counts, file_type='txt', file_name=f"{block_filename_base}.txt")
-    save_tile_info(color_counts, file_type='xlsx', file_name=f"{block_filename_base}.xlsx")"""
-
-
-    #это для вывода матрицы тхт конкретного цвета
-    def save_block_info(rgb_image, color, size_of_square, x, y):
-        # Формируем матрицу 0 и 1
-        matrix = np.zeros((size_of_square, size_of_square), dtype=int)
-        for i in range(size_of_square):
-            for j in range(size_of_square):
-                if np.array_equal(rgb_image[i, j], color):
-                    matrix[i, j] = 1
-
-        r, g, b = color
-        color_str = f"({r}, {g}, {b})"
-
-        txt_filename = f"block_matrix_{y}_{x}.txt"
-        with open(txt_filename, 'w') as file:
-            file.write(f"Color: {color_str}\n")
-            file.write("Matrix:\n")
-
-            # Заголовок с номерами столбцов
-            file.write("    " + " ".join(f"{j:>3}" for j in range(size_of_square)) + "\n")
-
-            # Каждая строка с номером строки и выровненными значениями
-            for i, row in enumerate(matrix):
-                file.write(f"{i:>3} " + " ".join(f"{val:>3}" for val in row) + "\n")
-
+    save_tile_info(config.color_counts, file_type='txt', file_name=f"{block_filename_base}.txt")
+    save_tile_info(config.color_counts, file_type='xlsx', file_name=f"{block_filename_base}.xlsx")"""
 
     def on_click_square(event):
         if event.button == MouseButton.LEFT:
             #для вывода конкретного цвета блока
-            '''x_coord = math.floor(event.xdata)  # Получаем координаты клика
+            x_coord = math.floor(event.xdata)  # Получаем координаты клика
             y_coord = math.floor(event.ydata)
 
             # Получаем цвет пикселя по этим координатам
             color = tuple(rgb_image[y_coord, x_coord])  # Цвет пикселя
-            save_block_info(rgb_image, color, size_of_square, x_coord, y_coord)  # Сохраняем информацию
-            '''
+            config.temp_x = x
+            config.temp_y = y
+
             if event.inaxes == ax:
                 show_color(size_of_square, event.xdata, event.ydata, rgb_image)
 
@@ -254,10 +265,16 @@ def get_square_by_coordinate(x, y, height, width, size_of_square, img):
     # Обработчики кнопок
     def go_back(event):
         print("Back")
-        plt.close('all')
+        plt.close()
 
     def save_image(event):
         print("Save")
+        block_filename_base = f"block_{y}_{x}"
+        print(config.file_type[1::])
+        if config.file_type != '.txt':
+            save_tile_info(config.color_counts, file_type=config.file_type[1::], file_name=f"{block_filename_base}.xlsx")
+        else:
+            save_tile_info(config.color_counts, file_type=config.file_type[1::], file_name=f"{block_filename_base}.txt")
 
     # Создаем первую кнопку (Show Palette)
     ax_btn_back = plt.axes([0.2, 0.1, 0.3, 0.1])   # [left, bottom, width, height]
@@ -382,8 +399,12 @@ def show_main_pic(height, rgb_image, size_of_square, width, input_colors):
 
     def on_save(event):
         print("Save button clicked")
-        # Здесь можно добавить логику сохранения изображения
-        # Например: plt.savefig("output.png")
+        if config.file_type != '.txt':
+            save_tile_info(config.info_table, file_type=config.file_type[1::],
+                           file_name='info_table.xlsx')
+        else:
+            save_tile_info(config.info_table, file_type=config.file_type[1::], file_name='info_table.txt')
+
 
     # Создаем первую кнопку (Show Palette)
     show_palette_ax = plt.axes([0.2, 0.05, 0.2, 0.075])  # [left, bottom, width, height]
@@ -424,23 +445,14 @@ def func(width, height, path, input_colors, format_to_save, block_size):
             rgb_image[y, x] = nearest_color
 
             if nearest_color not in info_table:
-                info_table[nearest_color] = {"count": 0, "coordinates": []}
-            info_table[nearest_color]["count"] += 1
-            info_table[nearest_color]["coordinates"].append((x, y))
+                config.info_table[nearest_color] = {"count": 0, "coordinates": []}
+            config.info_table[nearest_color]["count"] += 1
+            config.info_table[nearest_color]["coordinates"].append((x, y))
 
     config.global_img = rgb_image
     config.global_w = width
     config.global_h = height
     config.global_info_table = info_table
-    ### таблицы тоже должны создаваться по требованию а не каждый раз ###
-    #сто проц работает правильно
-    ### save_tile_info(info_table, 'xlsx')
-    ### save_tile_info(info_table, 'txt')
-    ### теперь при нажатии кнопки вызывать(только хз работает ли):
-    ### save_tile_info(config.global_info_table, 'xlsx')
-    ### save_tile_info(config.global_info_table, 'txt')
-    ###print(img_array)
-
 
     ### размер блока должен подаваться как входные данные
     ### добавила сюда размер блока из входных данных
@@ -505,12 +517,12 @@ def func(width, height, path, input_colors, format_to_save, block_size):
 
     def on_continue(event):
         print("continue")
-        plt.close("all")
+        plt.close()
         show_main_pic(height, rgb_image, size_of_square, width, input_colors)
 
     def on_goback(event):
         print("go back")
-        plt.close("all")
+        plt.close()
 
     # Создаем первую кнопку (Continue)
     continue_ax = plt.axes([0.2, 0.05, 0.2, 0.075])  # [left, bottom, width, height]

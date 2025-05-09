@@ -4,11 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2bdc7d0c-71d8-484f-acad-26f1a7788f7a" name="Changes" comment="скажем нет миганиям">
+    <list default="true" id="2bdc7d0c-71d8-484f-acad-26f1a7788f7a" name="Changes" comment="сэйвы">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/config.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/interface.py" beforeDir="false" afterPath="$PROJECT_DIR$/interface.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/work_alg.py" beforeDir="false" afterPath="$PROJECT_DIR$/work_alg.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -185,7 +182,15 @@
       <option name="project" value="LOCAL" />
       <updated>1746691207351</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="сэйвы">
+      <option name="closed" value="true" />
+      <created>1746821862379</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1746821862379</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -211,6 +216,7 @@
     <MESSAGE value="в палитре квадратики теперь кнопки" />
     <MESSAGE value="доделала вывод фулл картинки по одному цвету" />
     <MESSAGE value="скажем нет миганиям" />
-    <option name="LAST_COMMIT_MESSAGE" value="скажем нет миганиям" />
+    <MESSAGE value="сэйвы" />
+    <option name="LAST_COMMIT_MESSAGE" value="сэйвы" />
   </component>
 </project>
