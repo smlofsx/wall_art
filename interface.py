@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import QApplication, QFileDialog, QMessageBox, QMainWindow
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtCore import Qt
 from PIL import Image
+import config
 
 
 
@@ -119,7 +120,8 @@ class MyApp(QMainWindow, Ui_MainWindow):
             QMessageBox.warning(self, "Error", "Please load all things before generating.")
             return
         # Вызываем функцию генерации
-
+        config.file_type = self.format_to_save
+        config.size_of_square = self.size
         func(self.width, self.height, self.path, self.input_colors, self.format_to_save, self.size)
 
 

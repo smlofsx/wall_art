@@ -1,3 +1,9 @@
 global_w=0
 global_h=0
 global_img=None
+color_counts = {}
+file_type=None
+info_table = {}
+size_of_square=0
+temp_x=0
+temp_y=0
