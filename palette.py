@@ -11,6 +11,30 @@ import config
 from matplotlib.widgets import Button
 
 
+def save_block_info_full(rgb_image, color):
+    # Формируем матрицу 0 и 1
+    matrix = np.zeros((config.global_h, config.global_w), dtype=int)
+    for i in range(config.global_h):
+        for j in range(config.global_w):
+            if np.array_equal(rgb_image[i, j], color):
+                matrix[i, j] = 1
+
+    r, g, b = color
+    color_str = f"({r}, {g}, {b})"
+
+    txt_filename = f"full_color_{color_str}.txt"
+    with open(txt_filename, 'w') as file:
+        file.write(f"Color: {color_str}\n")
+        file.write("Matrix:\n")
+
+        # Заголовок с номерами столбцов
+        file.write("    " + " ".join(f"{j:>3}" for j in range(config.global_w)) + "\n")
+
+        # Каждая строка с номером строки и выровненными значениями
+        for i, row in enumerate(matrix):
+            file.write(f"{i:>3} " + " ".join(f"{val:>3}" for val in row) + "\n")
+
+
 def show_pic_by_color(color, img, width, height):
     # Проверяем, есть ли уже открытое окно
     if hasattr(show_pic_by_color, 'window') and plt.fignum_exists(show_pic_by_color.window.number):
@@ -38,7 +62,7 @@ def show_pic_by_color(color, img, width, height):
     plt.subplots_adjust(bottom=0.3)  # Освобождаем место для кнопок
     def save_image(event):
         print("Save")
-        # Сохранение
+        save_block_info_full(config.global_img, color)
 
     plt.gca().xaxis.set_ticks_position('top')  # Метки оси X наверх
     plt.gca().xaxis.set_label_position('top')  # Подпись оси X наверх

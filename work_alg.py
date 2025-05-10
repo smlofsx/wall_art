@@ -1,7 +1,6 @@
 import math
 from typing import override
 
-from config import info_table
 from palette import show_palette, show_palette_nonblocking
 import numpy as np
 import matplotlib

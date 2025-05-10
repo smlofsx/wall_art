@@ -24,6 +24,7 @@ class MyApp(QMainWindow, Ui_MainWindow):
         self.block_size.clicked.connect(self.enter_size_click)
         self.select_format.activated.connect(self.current_format)
         self.generateButton.clicked.connect(self.generate)
+        self.help_button.clicked.connect(self.load_help_file)
         self.size = None
         self.width = None
         self.height = None
@@ -113,6 +114,10 @@ class MyApp(QMainWindow, Ui_MainWindow):
     def current_format(self, _):
         ctext = self.select_format.currentText()
         self.format_to_save = ctext
+
+    def load_help_file(self):
+        #вот тут скачать инструкцию надо
+        print("load help file")
 
     def generate(self):
         # Проверяем, загружены ли изображение и палитра

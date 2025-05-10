@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(526, 354)
+        MainWindow.resize(575, 426)
         font = QtGui.QFont()
         font.setFamily("Candara")
         font.setPointSize(20)
@@ -24,13 +24,13 @@ class Ui_MainWindow(object):
         MainWindow.setFont(font)
         MainWindow.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         MainWindow.setStyleSheet("background-color: rgb(251, 248, 244);\n"
-"border-color: rgb(0, 0, 0);\n"
-"font: 75 20pt \"Candara\";\n"
-"color:#ab926f;")
+                                 "border-color: rgb(0, 0, 0);\n"
+                                 "font: 75 20pt \"Candara\";\n"
+                                 "color:#ab926f;")
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.loadImageButton = QtWidgets.QPushButton(self.centralwidget)
-        self.loadImageButton.setGeometry(QtCore.QRect(90, 30, 181, 51))
+        self.loadImageButton.setGeometry(QtCore.QRect(50, 70, 241, 51))
         font = QtGui.QFont()
         font.setFamily("Candara")
         font.setPointSize(20)
@@ -39,10 +39,10 @@ class Ui_MainWindow(object):
         font.setWeight(9)
         self.loadImageButton.setFont(font)
         self.loadImageButton.setStyleSheet("background-color: #ab926f;\n"
-"color: rgb(251, 248, 244);")
+                                           "color: rgb(251, 248, 244);")
         self.loadImageButton.setObjectName("loadImageButton")
         self.loadPaletteButton = QtWidgets.QPushButton(self.centralwidget)
-        self.loadPaletteButton.setGeometry(QtCore.QRect(290, 30, 181, 51))
+        self.loadPaletteButton.setGeometry(QtCore.QRect(310, 70, 221, 51))
         font = QtGui.QFont()
         font.setFamily("Candara")
         font.setPointSize(20)
@@ -51,10 +51,10 @@ class Ui_MainWindow(object):
         font.setWeight(9)
         self.loadPaletteButton.setFont(font)
         self.loadPaletteButton.setStyleSheet("background-color: #ab926f;\n"
-"color: rgb(251, 248, 244);")
+                                             "color: rgb(251, 248, 244);")
         self.loadPaletteButton.setObjectName("loadPaletteButton")
         self.generateButton = QtWidgets.QPushButton(self.centralwidget)
-        self.generateButton.setGeometry(QtCore.QRect(90, 220, 381, 81))
+        self.generateButton.setGeometry(QtCore.QRect(50, 260, 481, 101))
         font = QtGui.QFont()
         font.setFamily("Candara")
         font.setPointSize(32)
@@ -63,13 +63,13 @@ class Ui_MainWindow(object):
         font.setWeight(9)
         self.generateButton.setFont(font)
         self.generateButton.setStyleSheet("background-color: rgb(151, 94, 89);\n"
-"font: 75 32pt \"Candara\";\n"
-"color: rgb(251, 248, 244);\n"
-"\n"
-"")
+                                          "font: 75 32pt \"Candara\";\n"
+                                          "color: rgb(251, 248, 244);\n"
+                                          "\n"
+                                          "")
         self.generateButton.setObjectName("generateButton")
         self.block_size = QtWidgets.QPushButton(self.centralwidget)
-        self.block_size.setGeometry(QtCore.QRect(90, 90, 271, 51))
+        self.block_size.setGeometry(QtCore.QRect(50, 130, 331, 51))
         font = QtGui.QFont()
         font.setFamily("Candara")
         font.setPointSize(20)
@@ -78,23 +78,52 @@ class Ui_MainWindow(object):
         font.setWeight(9)
         self.block_size.setFont(font)
         self.block_size.setStyleSheet("background-color: #ab926f;\n"
-"color: rgb(251, 248, 244);")
+                                      "color: rgb(251, 248, 244);")
         self.block_size.setObjectName("block_size")
         self.label = QtWidgets.QLabel(self.centralwidget)
-        self.label.setGeometry(QtCore.QRect(30, 160, 321, 31))
+        self.label.setGeometry(QtCore.QRect(50, 200, 321, 31))
         self.label.setStyleSheet("color: #ab926f;\n"
-"font: 75 15pt \"Candara\";")
+                                 "font: 75 15pt \"Candara\";")
         self.label.setObjectName("label")
         self.select_format = QtWidgets.QComboBox(self.centralwidget)
-        self.select_format.setGeometry(QtCore.QRect(360, 170, 151, 21))
+        self.select_format.setGeometry(QtCore.QRect(380, 200, 151, 31))
         self.select_format.setStyleSheet("color: #ab926f;\n"
-"font: 75 15pt \"Candara\";")
+                                         "font: 75 15pt \"Candara\";")
         self.select_format.setObjectName("select_format")
         self.select_format.addItem("")
         self.select_format.addItem("")
         self.lineEdit = QtWidgets.QLineEdit(self.centralwidget)
-        self.lineEdit.setGeometry(QtCore.QRect(380, 90, 91, 51))
+        self.lineEdit.setGeometry(QtCore.QRect(400, 130, 131, 51))
         self.lineEdit.setObjectName("lineEdit")
+
+        help_button_right = 310 + 221  # x + width of loadPaletteButton
+        help_button_size = 40
+        self.help_button = QtWidgets.QPushButton(self.centralwidget)
+        self.help_button.setGeometry(QtCore.QRect(
+            help_button_right - help_button_size,  # x (вычитаем ширину кнопки)
+            10,  # y (оставляем отступ сверху)
+            help_button_size,  # width
+            help_button_size  # height
+        ))
+        font = QtGui.QFont()
+        font.setFamily("Candara")
+        font.setPointSize(20)
+        font.setBold(True)
+        self.help_button.setFont(font)
+        self.help_button.setStyleSheet("""
+                    QPushButton {
+                        background-color: #ab926f;
+                        color: rgb(251, 248, 244);
+                        border-radius: 20px;
+                        border: none;
+                    }
+                    QPushButton:hover {
+                        background-color: #8a7a5d;
+                    }
+                """)
+        self.help_button.setObjectName("help_button")
+        self.help_button.setText("?")
+
         MainWindow.setCentralWidget(self.centralwidget)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
