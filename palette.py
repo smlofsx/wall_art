@@ -40,6 +40,11 @@ def show_pic_by_color(color, img, width, height):
         print("Save")
         # Сохранение
 
+    plt.gca().xaxis.set_ticks_position('top')  # Метки оси X наверх
+    plt.gca().xaxis.set_label_position('top')  # Подпись оси X наверх
+    plt.gca().spines['bottom'].set_visible(False)  # Скрываем нижнюю ось X
+    plt.gca().spines['top'].set_visible(True)
+
     ax_btn_save = plt.axes([0.35, 0.1, 0.3, 0.1])  # [left, bottom, width, height]
     save_button = Button(ax_btn_save, 'Save', color='lightgreen')
     save_button.on_clicked(save_image)
