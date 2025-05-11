@@ -102,7 +102,7 @@ class MyApp(QMainWindow, Ui_MainWindow):
 
     def enter_size_click(self):
         text = self.lineEdit.text()
-        if text.isdigit():
+        if text.isdigit() and self.width and self.height and int(text) <= self.width and int(text) <= self.height:
             self.size = int(text)
             info_msg = "Success enter size"
             QMessageBox.information(self, "Success", info_msg)

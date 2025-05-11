@@ -42,23 +42,28 @@ def show_pic_by_color(color, img, width, height):
         ax.clear()
     else:
         # Создаем новое окно с уникальным менеджером
-        show_pic_by_color.window = plt.figure(figsize=(8, 9))
+        show_pic_by_color.window = plt.figure(figsize=(8, 9), facecolor='white')
 
         ax = show_pic_by_color.window.add_subplot(111)
         show_pic_by_color.window.canvas.manager.set_window_title('Color View')
 
-        # Преобразуем цвет в кортеж, если это массив
+    # Создаем изображение с белым фоном
+    res = np.full((height, width, 3), 255, dtype=np.uint8)  # Белый фон
+    color_array = np.array(color, dtype=np.uint8)
+    mask = np.all(img == color_array, axis=2)
 
-    # Оптимизированное создание изображения
-    res = np.zeros((height, width, 3), dtype=np.uint8)
-    color_array = np.array(color, dtype=np.uint8)  # Преобразуем кортеж в массив
-    mask = np.all(img == color_array, axis=2)  # Теперь сравнение корректно
+    # Устанавливаем выбранный цвет
     res[mask] = color
 
+    # Отображаем изображение
     ax.imshow(res, extent=[0, width, height, 0])
     ax.set_title(f"Color: {color}")
 
+    # Устанавливаем белый фон для осей
+    ax.set_facecolor('white')
+
     plt.subplots_adjust(bottom=0.3)  # Освобождаем место для кнопок
+
     def save_image(event):
         print("Save")
         app = QApplication.instance() or QApplication([])
@@ -78,25 +83,23 @@ def show_pic_by_color(color, img, width, height):
         if file_path:  # Если пользователь выбрал место сохранения
             save_block_info_full(config.global_img, color, file_path)
 
-    plt.gca().xaxis.set_ticks_position('top')  # Метки оси X наверх
-    plt.gca().xaxis.set_label_position('top')  # Подпись оси X наверх
-    plt.gca().spines['bottom'].set_visible(False)  # Скрываем нижнюю ось X
+    plt.gca().xaxis.set_ticks_position('top')
+    plt.gca().xaxis.set_label_position('top')
+    plt.gca().spines['bottom'].set_visible(False)
     plt.gca().spines['top'].set_visible(True)
 
-    ax_btn_save = plt.axes([0.35, 0.1, 0.3, 0.1])  # [left, bottom, width, height]
+    ax_btn_save = plt.axes([0.35, 0.1, 0.3, 0.1])
     save_button = Button(ax_btn_save, 'Save', color='lightgreen')
     save_button.on_clicked(save_image)
 
-    # Настройки для плавного отображения
-    #plt.tight_layout()
     plt.show(block=False)
 
-    # Важно: обрабатываем события PyQt
+    # Обрабатываем события PyQt
     app = QApplication.instance()
     if app:
         app.processEvents()
 
-    while plt.fignum_exists(show_pic_by_color.window.number):  # Пока окно не закрыто
+    while plt.fignum_exists(show_pic_by_color.window.number):
         plt.pause(0.01)
 
     return show_pic_by_color.window

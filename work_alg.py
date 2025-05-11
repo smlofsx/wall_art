@@ -164,7 +164,7 @@ def show_color(size, x1, y1, block): # вывод блока по цвету
         for i in range(size):
             for j in range(size):
                 if not np.array_equal(block[j, i], col):  # если не тот цвет, красим в черный
-                    res[j][i] = (0, 0, 0)
+                    res[j][i] = (255, 255, 255)
                 else:
                     res[j][i] = block[j][i]  # иначе сохраняеем цвет
 
