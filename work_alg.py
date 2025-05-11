@@ -44,7 +44,7 @@ global_img_col=0
 
 
 #это для вывода матрицы тхт конкретного цвета
-def save_block_info(rgb_image, color, size_of_square, x, y):
+def save_block_info(rgb_image, color, size_of_square, x, y, file_name):
     # Формируем матрицу 0 и 1
     matrix = np.zeros((size_of_square, size_of_square), dtype=int)
     for i in range(size_of_square):
@@ -55,8 +55,7 @@ def save_block_info(rgb_image, color, size_of_square, x, y):
     r, g, b = color
     color_str = f"({r}, {g}, {b})"
 
-    txt_filename = f"block_{config.temp_y}_{config.temp_x}_color_{color_str}.txt"
-    with open(txt_filename, 'w') as file:
+    with open(file_name, 'w') as file:
         file.write(f"Color: {color_str}\n")
         file.write("Matrix:\n")
 
@@ -187,8 +186,19 @@ def show_color(size, x1, y1, block): # вывод блока по цвету
 
         def save_image(event):
             print("Save")
-            save_block_info(config.global_img, col, config.size_of_square, x1, y1)
-            #!!!!!!!!!!!
+            app = QApplication.instance() or QApplication([])
+            default_name = f"block_{config.temp_y}_{config.temp_x}_color_{col}.txt"
+
+            # Открываем диалог сохранения файла
+            file_path, _ = QFileDialog.getSaveFileName(
+                None,
+                "Save File",
+                default_name,
+                "Text Files (*.txt);;All Files (*)"
+            )
+
+            if file_path:  # Если пользователь выбрал место сохранения
+                save_block_info(config.temp_rgb, col, config.size_of_square, config.temp_x, config.temp_y, file_path)
 
         # Создаем первую кнопку (Show Palette)
         ax_btn_back = plt.axes([0.2, 0.1, 0.3, 0.1])  # [left, bottom, width, height]
@@ -243,8 +253,10 @@ def get_square_by_coordinate(x, y, height, width, size_of_square, img):
 
             # Получаем цвет пикселя по этим координатам
             color = tuple(rgb_image[y_coord, x_coord])  # Цвет пикселя
+            #save_block_info(rgb_image, color, size_of_square, x_coord, y_coord)
             config.temp_x = x
             config.temp_y = y
+            config.temp_rgb = rgb_image
 
             if event.inaxes == ax:
                 show_color(size_of_square, event.xdata, event.ydata, rgb_image)
@@ -268,12 +280,23 @@ def get_square_by_coordinate(x, y, height, width, size_of_square, img):
 
     def save_image(event):
         print("Save")
+        app = QApplication.instance() or QApplication([])
         block_filename_base = f"block_{y}_{x}"
-        print(config.file_type[1::])
-        if config.file_type != '.txt':
-            save_tile_info(config.color_counts, file_type=config.file_type[1::], file_name=f"{block_filename_base}.xlsx")
-        else:
-            save_tile_info(config.color_counts, file_type=config.file_type[1::], file_name=f"{block_filename_base}.txt")
+        default_name = f"{block_filename_base}{config.file_type}"
+
+        # Открываем диалог сохранения файла
+        file_path, _ = QFileDialog.getSaveFileName(
+            None,
+            "Save File",
+            default_name,
+            f"All Files (*);;Text Files (*.txt);;Excel Files (*.xlsx)"
+        )
+
+        if file_path:  # Если пользователь выбрал место сохранения
+            if config.file_type != '.txt':
+                save_tile_info(config.color_counts, file_type=config.file_type[1::], file_name=file_path)
+            else:
+                save_tile_info(config.color_counts, file_type=config.file_type[1::], file_name=file_path)
 
     # Создаем первую кнопку (Show Palette)
     ax_btn_back = plt.axes([0.2, 0.1, 0.3, 0.1])   # [left, bottom, width, height]
@@ -342,11 +365,22 @@ def show_main_pic(height, rgb_image, size_of_square, width, input_colors):
 
     def on_save(event):
         print("Save button clicked")
-        if config.file_type != '.txt':
-            save_tile_info(config.info_table, file_type=config.file_type[1::],
-                           file_name='info_table.xlsx')
-        else:
-            save_tile_info(config.info_table, file_type=config.file_type[1::], file_name='info_table.txt')
+        app = QApplication.instance() or QApplication([])
+        default_name = f"info_table{config.file_type}"
+
+        # Открываем диалог сохранения файла
+        file_path, _ = QFileDialog.getSaveFileName(
+            None,
+            "Save File",
+            default_name,
+            f"All Files (*);;Text Files (*.txt);;Excel Files (*.xlsx)"
+        )
+
+        if file_path:  # Если пользователь выбрал место сохранения
+            if config.file_type != '.txt':
+                save_tile_info(config.global_info_table, file_type=config.file_type[1::], file_name=file_path)
+            else:
+                save_tile_info(config.global_info_table, file_type=config.file_type[1::], file_name=file_path)
 
 
     # Создаем первую кнопку (Show Palette)
@@ -388,9 +422,9 @@ def func(width, height, path, input_colors, format_to_save, block_size):
             rgb_image[y, x] = nearest_color
 
             if nearest_color not in info_table:
-                config.info_table[nearest_color] = {"count": 0, "coordinates": []}
-            config.info_table[nearest_color]["count"] += 1
-            config.info_table[nearest_color]["coordinates"].append((x, y))
+                info_table[nearest_color] = {"count": 0, "coordinates": []}
+            info_table[nearest_color]["count"] += 1
+            info_table[nearest_color]["coordinates"].append((x, y))
 
     config.global_img = rgb_image
     config.global_w = width

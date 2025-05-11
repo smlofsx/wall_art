@@ -2,7 +2,7 @@ import sys
 from functools import lru_cache
 
 from PyQt5.QtWidgets import (QApplication, QWidget, QVBoxLayout, QHBoxLayout,
-                             QPushButton, QLabel)
+                             QPushButton, QLabel, QFileDialog)
 from PyQt5.QtGui import QColor, QPainter, QFont, QPainterPath
 from PyQt5.QtCore import Qt, QRectF
 import numpy as np
@@ -11,7 +11,7 @@ import config
 from matplotlib.widgets import Button
 
 
-def save_block_info_full(rgb_image, color):
+def save_block_info_full(rgb_image, color, file_name):
     # Формируем матрицу 0 и 1
     matrix = np.zeros((config.global_h, config.global_w), dtype=int)
     for i in range(config.global_h):
@@ -22,8 +22,7 @@ def save_block_info_full(rgb_image, color):
     r, g, b = color
     color_str = f"({r}, {g}, {b})"
 
-    txt_filename = f"full_color_{color_str}.txt"
-    with open(txt_filename, 'w') as file:
+    with open(file_name, 'w') as file:
         file.write(f"Color: {color_str}\n")
         file.write("Matrix:\n")
 
@@ -62,7 +61,22 @@ def show_pic_by_color(color, img, width, height):
     plt.subplots_adjust(bottom=0.3)  # Освобождаем место для кнопок
     def save_image(event):
         print("Save")
-        save_block_info_full(config.global_img, color)
+        app = QApplication.instance() or QApplication([])
+
+        r, g, b = color
+        color_str = f"({r}, {g}, {b})"
+        default_name = f"full_color_{color_str}.txt"
+
+        # Открываем диалог сохранения файла
+        file_path, _ = QFileDialog.getSaveFileName(
+            None,
+            "Save File",
+            default_name,
+            "Text Files (*.txt);;All Files (*)"
+        )
+
+        if file_path:  # Если пользователь выбрал место сохранения
+            save_block_info_full(config.global_img, color, file_path)
 
     plt.gca().xaxis.set_ticks_position('top')  # Метки оси X наверх
     plt.gca().xaxis.set_label_position('top')  # Подпись оси X наверх

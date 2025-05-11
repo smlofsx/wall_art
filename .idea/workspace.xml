@@ -4,12 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2bdc7d0c-71d8-484f-acad-26f1a7788f7a" name="Changes" comment="сэйвы">
+    <list default="true" id="2bdc7d0c-71d8-484f-acad-26f1a7788f7a" name="Changes" comment="пополнение в семье кнопочек">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WallArtGenerate.py" beforeDir="false" afterPath="$PROJECT_DIR$/WallArtGenerate.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WallArtGenerate.ui" beforeDir="false" afterPath="$PROJECT_DIR$/WallArtGenerate.ui" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/interface.py" beforeDir="false" afterPath="$PROJECT_DIR$/interface.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/config.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/palette.py" beforeDir="false" afterPath="$PROJECT_DIR$/palette.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/work_alg.py" beforeDir="false" afterPath="$PROJECT_DIR$/work_alg.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -73,6 +72,35 @@
       <recent name="C:\Users\User\PycharmProjects\wall_art_new" />
       <recent name="C:\Users\User\PycharmProjects\wall_art_true" />
     </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="interface" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="wall_art_true" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/interface.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.interface" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -202,7 +230,15 @@
       <option name="project" value="LOCAL" />
       <updated>1746822628779</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="пополнение в семье кнопочек">
+      <option name="closed" value="true" />
+      <created>1746911364486</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1746911364486</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -229,6 +265,7 @@
     <MESSAGE value="доделала вывод фулл картинки по одному цвету" />
     <MESSAGE value="скажем нет миганиям" />
     <MESSAGE value="сэйвы" />
-    <option name="LAST_COMMIT_MESSAGE" value="сэйвы" />
+    <MESSAGE value="пополнение в семье кнопочек" />
+    <option name="LAST_COMMIT_MESSAGE" value="пополнение в семье кнопочек" />
   </component>
 </project>
