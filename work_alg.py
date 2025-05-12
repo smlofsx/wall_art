@@ -161,19 +161,20 @@ def show_color(size, x1, y1, block): # вывод блока по цвету
 
         res = np.zeros((size, size, 3), dtype=np.uint8)
         col = block[y1, x1]  # цвет, который был нажат
-        for i in range(size):
-            for j in range(size):
-                if not np.array_equal(block[j, i], col):  # если не тот цвет, красим в черный
-                    res[j][i] = (0, 0, 0)
-                else:
-                    res[j][i] = block[j][i]  # иначе сохраняеем цвет
+        is_white = np.all(np.array(col) == 255)
+        bg_color = (220, 220, 220) if is_white else (255, 255, 255)
 
-        fig, ax=plt.subplots(figsize=(5, 5), facecolor='lightgray')
+        # Создаем изображение с фоном
+        res = np.full((size, size, 3), bg_color, dtype=np.uint8)
+        mask = np.all(block == col, axis=2)
+        res[mask] = col
+
+        fig, ax = plt.subplots(figsize=(5, 5), facecolor='white')
         plt.imshow(res, extent=[0, size, size, 0])
 
-        plt.gca().xaxis.set_ticks_position('top')  # Метки оси X наверх
-        plt.gca().xaxis.set_label_position('top')  # Подпись оси X наверх
-        plt.gca().spines['bottom'].set_visible(False)  # Скрываем нижнюю ось X
+        plt.gca().xaxis.set_ticks_position('top')
+        plt.gca().xaxis.set_label_position('top')
+        plt.gca().spines['bottom'].set_visible(False)
         plt.gca().spines['top'].set_visible(True)
 
         # Создание кнопок

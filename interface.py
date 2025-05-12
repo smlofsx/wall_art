@@ -1,3 +1,5 @@
+import os
+
 from work_alg import func
 from WallArtGenerate import Ui_MainWindow
 from palette import ColorVisualizer
@@ -8,6 +10,7 @@ from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtCore import Qt
 from PIL import Image
 import config
+import shutil
 
 
 
@@ -102,10 +105,18 @@ class MyApp(QMainWindow, Ui_MainWindow):
 
     def enter_size_click(self):
         text = self.lineEdit.text()
-        if text.isdigit():
+        if text.isdigit() and self.width and self.height and int(text) <= self.width and int(text) <= self.height:
             self.size = int(text)
             info_msg = "Success enter size"
             QMessageBox.information(self, "Success", info_msg)
+        elif not self.width or not self.height:
+            error_msg = "Firstly, load image"
+            QMessageBox.critical(self, "Format Error", error_msg)
+            return
+        elif not self.height and int(text) <= self.width or not int(text) <= self.height:
+            error_msg = "Block size is too big"
+            QMessageBox.critical(self, "Format Error", error_msg)
+            return
         else:
             error_msg = "Invalid number"
             QMessageBox.critical(self, "Format Error", error_msg)
@@ -116,8 +127,24 @@ class MyApp(QMainWindow, Ui_MainWindow):
         self.format_to_save = ctext
 
     def load_help_file(self):
-        #вот тут скачать инструкцию надо
-        print("load help file")
+        help_file = "WALL_ART.pdf"
+        if not os.path.exists(help_file):
+            QMessageBox.critical(self, "Error", "Help file not found in application directory")
+            return
+
+        file_path, _ = QFileDialog.getSaveFileName(
+            self,
+            "Save Help File As",
+            help_file,
+            "Word Documents (*.pdf);;All Files (*)"
+        )
+
+        if file_path:
+            shutil.copyfile(help_file, file_path)
+            if os.path.exists(file_path):
+                QMessageBox.information(self, "Success", f"Help file saved to:\n{file_path}")
+            else:
+                QMessageBox.critical(self, "Error", "Failed to save help file")
 
     def generate(self):
         # Проверяем, загружены ли изображение и палитра
@@ -127,6 +154,7 @@ class MyApp(QMainWindow, Ui_MainWindow):
         # Вызываем функцию генерации
         config.file_type = self.format_to_save
         config.size_of_square = self.size
+        self.visualizer_window.close()
         func(self.width, self.height, self.path, self.input_colors, self.format_to_save, self.size)
 
 

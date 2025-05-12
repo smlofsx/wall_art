@@ -35,30 +35,28 @@ def save_block_info_full(rgb_image, color, file_name):
 
 
 def show_pic_by_color(color, img, width, height):
-    # Проверяем, есть ли уже открытое окно
-    if hasattr(show_pic_by_color, 'window') and plt.fignum_exists(show_pic_by_color.window.number):
-        # Если окно существует, просто обновляем его содержимое
-        ax = show_pic_by_color.window.axes[0]
-        ax.clear()
-    else:
-        # Создаем новое окно с уникальным менеджером
-        show_pic_by_color.window = plt.figure(figsize=(8, 9))
+    if hasattr(show_pic_by_color, 'window'):
+        try:
+            plt.close(show_pic_by_color.window)
+        except:
+            pass
+    # Определяем цвет фона в зависимости от выбранного цвета
+    bg_color = (220, 220, 220) if color == (255, 255, 255) else (255, 255, 255)
 
-        ax = show_pic_by_color.window.add_subplot(111)
-        show_pic_by_color.window.canvas.manager.set_window_title('Color View')
+    show_pic_by_color.window = plt.figure(figsize=(8, 9), facecolor='white')
+    ax = show_pic_by_color.window.add_subplot(111)
+    show_pic_by_color.window.canvas.manager.set_window_title('Color View')
 
-        # Преобразуем цвет в кортеж, если это массив
 
-    # Оптимизированное создание изображения
-    res = np.zeros((height, width, 3), dtype=np.uint8)
-    color_array = np.array(color, dtype=np.uint8)  # Преобразуем кортеж в массив
-    mask = np.all(img == color_array, axis=2)  # Теперь сравнение корректно
+    res = np.full((height, width, 3), bg_color, dtype=np.uint8)
+    color_array = np.array(color, dtype=np.uint8)
+    mask = np.all(img == color_array, axis=2)
     res[mask] = color
 
     ax.imshow(res, extent=[0, width, height, 0])
     ax.set_title(f"Color: {color}")
 
-    plt.subplots_adjust(bottom=0.3)  # Освобождаем место для кнопок
+    plt.subplots_adjust(bottom=0.3)
     def save_image(event):
         print("Save")
         app = QApplication.instance() or QApplication([])
@@ -67,7 +65,7 @@ def show_pic_by_color(color, img, width, height):
         color_str = f"({r}, {g}, {b})"
         default_name = f"full_color_{color_str}.txt"
 
-        # Открываем диалог сохранения файла
+
         file_path, _ = QFileDialog.getSaveFileName(
             None,
             "Save File",
